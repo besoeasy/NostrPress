@@ -2,7 +2,7 @@
 
 {% set pageTitle = article.title ~ " · " ~ site.title %}
 {% set pageDescription = article.summary or site.description %}
-{% set canonicalUrl = site.base_url ~ "/" ~ article.slug ~ ".html" %}
+{% set canonicalUrl = (site.base_url ~ "/" ~ article.slug ~ ".html") if site.base_url else "" %}
 {% set ogType = "article" %}
 {% set ogImage = article.image or "" %}
 

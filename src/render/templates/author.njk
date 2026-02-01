@@ -2,7 +2,7 @@
 
 {% set pageTitle = site.title ~ " · " ~ (author.profile.display_name or author.profile.name or author.npub) %}
 {% set pageDescription = author.profile.about or site.description %}
-{% set canonicalUrl = site.base_url ~ "/author/" %}
+{% set canonicalUrl = (site.base_url ~ "/author/") if site.base_url else "" %}
 {% set ogType = "profile" %}
 {% set ogImage = author.profile.picture or "" %}
 

@@ -2,7 +2,7 @@
 
 {% set pageTitle = site.title %}
 {% set pageDescription = site.description %}
-{% set canonicalUrl = site.base_url %}
+{% set canonicalUrl = site.base_url if site.base_url else "" %}
 {% set ogType = "website" %}
 {% set ogImage = "" %}
 

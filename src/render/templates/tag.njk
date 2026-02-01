@@ -2,7 +2,7 @@
 
 {% set pageTitle = "#" ~ tag ~ " · " ~ site.title %}
 {% set pageDescription = "Articles tagged with #" ~ tag %}
-{% set canonicalUrl = site.base_url ~ "/tags/" ~ tag ~ "/" %}
+{% set canonicalUrl = (site.base_url ~ "/tags/" ~ tag ~ "/") if site.base_url else "" %}
 {% set ogType = "website" %}
 {% set ogImage = "" %}
 

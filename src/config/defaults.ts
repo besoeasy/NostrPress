@@ -10,7 +10,7 @@ export const defaultConfig: Config = {
   site: {
     title: "auto",
     description: "auto",
-    base_url: "http://localhost:3000"
+    base_url: ""
   },
   media: {
     download: true,

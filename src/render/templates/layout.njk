@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ pageTitle }}</title>
     <meta name="description" content="{{ pageDescription }}" />
+    {% if canonicalUrl %}
     <link rel="canonical" href="{{ canonicalUrl }}" />
+    {% endif %}
 
     <meta property="og:title" content="{{ pageTitle }}" />
     <meta property="og:description" content="{{ pageDescription }}" />
     <meta property="og:type" content="{{ ogType }}" />
+    {% if canonicalUrl %}
     <meta property="og:url" content="{{ canonicalUrl }}" />
+    {% endif %}
     {% if ogImage %}
     <meta property="og:image" content="{{ ogImage }}" />
     {% endif %}
@@ -23,6 +27,20 @@
     {% endif %}
 
     <link rel="stylesheet" href="/css/site.css" />
+    <script>
+      // Auto-detect canonical URL and OG URL if not set at build time
+      if (!document.querySelector('link[rel="canonical"]')) {
+        const canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        canonical.href = window.location.href;
+        document.head.appendChild(canonical);
+        
+        const ogUrl = document.createElement('meta');
+        ogUrl.setAttribute('property', 'og:url');
+        ogUrl.content = window.location.href;
+        document.head.appendChild(ogUrl);
+      }
+    </script>
     <style>
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(20px); }
