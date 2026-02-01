@@ -63,6 +63,7 @@ export interface Article {
   tags: string[];
   image?: string;
   imeta_urls: string[];
+  naddr?: string; // NIP-19 address
   comments: Comment[];
   readingTime?: number; // in minutes
   excerpt?: string; // SEO-friendly excerpt

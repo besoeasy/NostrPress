@@ -4,6 +4,9 @@ import crypto from "node:crypto";
 import { extension as mimeExtension } from "mime-types";
 import { Article, Config, MediaAsset } from "../types.js";
 import { discoverMediaUrls } from "./mediaScan.js";
+import { CacheManager } from "../cache/cacheManager.js";
+
+const mediaCache = new CacheManager("cache/media-map.json", 24 * 365); // Long cache for media (1 year)
 
 interface MediaResult {
   assets: MediaAsset[];
@@ -102,6 +105,20 @@ export async function processMedia(articles: Article[], config: Config): Promise
 
   for (const url of allUrls) {
     try {
+      // Check cache first
+      const cached = mediaCache.get<{ hash: string; mime: string }>(url);
+      if (cached) {
+        const { localPath, publicPath } = resolveAssetPath(cached.mime, cached.hash, config.output_dir);
+        if (fs.existsSync(localPath)) {
+            urlMap.set(url, publicPath);
+            if (!seenHashes.has(cached.hash)) {
+                assets.push({ url, localPath: publicPath, mime: cached.mime });
+                seenHashes.add(cached.hash);
+            }
+            continue; // Skip download
+        }
+      }
+
       const head = await headRequest(url, config.timeouts.network_ms);
       if (head.length && head.length > maxBytes) continue;
       const mime = head.mime || "";
@@ -112,6 +129,10 @@ export async function processMedia(articles: Article[], config: Config): Promise
       if (!matchMime(config.media.allowed_mime, finalMime)) continue;
 
       const hash = computeHash(buffer);
+      
+      // Cache the result
+      mediaCache.set(url, { hash, mime: finalMime });
+
       if (config.media.dedupe && seenHashes.has(hash)) {
         const { publicPath } = resolveAssetPath(finalMime, hash, config.output_dir);
         urlMap.set(url, publicPath);

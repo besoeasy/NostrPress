@@ -98,6 +98,28 @@
           Copy Link
         </button>
       </div>
+
+      <!-- Open elsewhere -->
+      {% if article.naddr %}
+      <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
+        <span class="text-sm font-medium text-slate-600">Open on:</span>
+        
+        <a href="https://habla.news/a/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
+          Habla
+        </a>
+
+        <a href="https://yakihonne.com/article/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
+          Yakihonne
+        </a>
+
+        <a href="https://primal.net/e/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all duration-200">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm4.5 17.5h-9v-11h9v11z"/></svg> 
+          Primal
+        </a>
+      </div>
+      {% endif %}
     </header>
 
     <div class="prose prose-lg xl:prose-xl max-w-none" itemprop="articleBody">

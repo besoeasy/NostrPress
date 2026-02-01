@@ -1,5 +1,5 @@
 import slugifyLib from "slugify";
-import { Event as NostrEvent } from "nostr-tools";
+import { Event as NostrEvent, nip19 } from "nostr-tools";
 import { Article } from "../types.js";
 
 const slugify = slugifyLib as unknown as (text: string, options?: any) => string;
@@ -45,10 +45,24 @@ export function parseArticle(event: NostrEvent): Article {
   const tagsList = getAllTagValues(tags, "t");
   const imeta_urls = parseImetaUrls(tags);
 
+  let naddr: string | undefined;
+  if (slugFromTag && event.kind === 30023) {
+    try {
+      naddr = nip19.naddrEncode({
+        identifier: slugFromTag,
+        pubkey: event.pubkey,
+        kind: 30023,
+      });
+    } catch (e) {
+      console.warn("Failed to encode naddr", e);
+    }
+  }
+
   return {
     id: event.id,
     title,
     slug,
+    naddr,
     summary,
     content: event.content,
     html: "",
