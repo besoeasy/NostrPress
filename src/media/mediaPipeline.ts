@@ -8,6 +8,35 @@ import { CacheManager } from "../cache/cacheManager.js";
 
 const mediaCache = new CacheManager("cache/media-map.json", 24 * 365); // Long cache for media (1 year)
 
+const COMMON_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/ogg"
+]);
+
+const COMMON_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "svg",
+  "mp4",
+  "webm",
+  "mov",
+  "mp3",
+  "wav",
+  "ogg"
+]);
+
 interface MediaResult {
   assets: MediaAsset[];
   urlMap: Map<string, string>;
@@ -85,6 +114,32 @@ function resolveAssetPath(mime: string, hash: string, outputDir: string): { loca
   return { localPath, publicPath };
 }
 
+function normalizeUrl(rawUrl: string): string | null {
+  if (!rawUrl) return null;
+  const cleaned = rawUrl
+    .replace(/&gt;$/g, "")
+    .replace(/&lt;$/g, "")
+    .replace(/[>),.]+$/g, "")
+    .trim();
+  try {
+    const parsed = new URL(cleaned);
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+function isLikelyMediaUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const pathname = parsed.pathname.toLowerCase();
+    const ext = pathname.includes(".") ? pathname.split(".").pop() || "" : "";
+    return COMMON_EXTENSIONS.has(ext);
+  } catch {
+    return false;
+  }
+}
+
 export async function processMedia(articles: Article[], config: Config): Promise<MediaResult> {
   if (!config.media.download) {
     return { assets: [], urlMap: new Map() };
@@ -94,10 +149,17 @@ export async function processMedia(articles: Article[], config: Config): Promise
   const assets: MediaAsset[] = [];
   const seenHashes = new Set<string>();
 
+  // Ensure persistent cache directory exists
+  const PERSISTENT_CACHE_DIR = path.resolve(process.cwd(), "cache", "media");
+  fs.mkdirSync(PERSISTENT_CACHE_DIR, { recursive: true });
+
   const allUrls = new Set<string>();
   for (const article of articles) {
     for (const url of discoverMediaUrls(article)) {
-      allUrls.add(url);
+      const normalized = normalizeUrl(url);
+      if (!normalized) continue;
+      if (!isLikelyMediaUrl(normalized)) continue;
+      allUrls.add(normalized);
     }
   }
 
@@ -105,20 +167,35 @@ export async function processMedia(articles: Article[], config: Config): Promise
 
   for (const url of allUrls) {
     try {
-      // Check cache first
+      // Check cache map first
       const cached = mediaCache.get<{ hash: string; mime: string }>(url);
+      
       if (cached) {
+        const ext = mimeExtension(cached.mime) || "bin";
+        const cacheFileName = `${cached.hash}.${ext}`;
+        const cacheFilePath = path.join(PERSISTENT_CACHE_DIR, cacheFileName);
+
+        // Required public/local paths for the build output
         const { localPath, publicPath } = resolveAssetPath(cached.mime, cached.hash, config.output_dir);
-        if (fs.existsSync(localPath)) {
+
+        // If defined in cache map AND file exists in persistent cache
+        if (fs.existsSync(cacheFilePath)) {
+            // Copy from persistent cache to build output if needed
+            if (!fs.existsSync(localPath)) {
+                fs.mkdirSync(path.dirname(localPath), { recursive: true });
+                fs.copyFileSync(cacheFilePath, localPath);
+            }
+
             urlMap.set(url, publicPath);
             if (!seenHashes.has(cached.hash)) {
                 assets.push({ url, localPath: publicPath, mime: cached.mime });
                 seenHashes.add(cached.hash);
             }
-            continue; // Skip download
+            continue; // Used cached file
         }
       }
 
+      // If not in cache or file missing, download
       const head = await headRequest(url, config.timeouts.network_ms);
       if (head.length && head.length > maxBytes) continue;
       const mime = head.mime || "";
@@ -126,28 +203,44 @@ export async function processMedia(articles: Article[], config: Config): Promise
 
       const { buffer, mime: downloadedMime } = await download(url, config.timeouts.network_ms, maxBytes);
       const finalMime = downloadedMime || mime || "application/octet-stream";
+      
+      // Strict check: only process common media types
+      if (!COMMON_MIME_TYPES.has(finalMime)) {
+        continue;
+      }
+
       if (!matchMime(config.media.allowed_mime, finalMime)) continue;
 
       const hash = computeHash(buffer);
       
-      // Cache the result
+      // Save to persistent cache
+      const ext = mimeExtension(finalMime) || "bin";
+      const cacheFileName = `${hash}.${ext}`;
+      const cacheFilePath = path.join(PERSISTENT_CACHE_DIR, cacheFileName);
+      fs.writeFileSync(cacheFilePath, buffer);
+
+      // Update cache map
       mediaCache.set(url, { hash, mime: finalMime });
 
-      if (config.media.dedupe && seenHashes.has(hash)) {
-        const { publicPath } = resolveAssetPath(finalMime, hash, config.output_dir);
-        urlMap.set(url, publicPath);
-        continue;
-      }
-
       const { localPath, publicPath } = resolveAssetPath(finalMime, hash, config.output_dir);
+      
+      // Save to output directory
       fs.mkdirSync(path.dirname(localPath), { recursive: true });
       if (!fs.existsSync(localPath)) {
-        fs.writeFileSync(localPath, buffer);
+        fs.copyFileSync(cacheFilePath, localPath); 
       }
-      assets.push({ url, localPath: publicPath, mime: finalMime });
+
+      if (!seenHashes.has(hash) || !config.media.dedupe) {
+        if (!config.media.dedupe || !seenHashes.has(hash)) {
+            assets.push({ url, localPath: publicPath, mime: finalMime });
+            seenHashes.add(hash);
+        }
+      }
       urlMap.set(url, publicPath);
-      seenHashes.add(hash);
-    } catch {
+
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn(`Skipping media ${url}: ${message}`);
       continue;
     }
   }
