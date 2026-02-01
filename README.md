@@ -5,8 +5,10 @@ Generate a modern static blog from your Nostr long-form posts (kind 30023).
 ## Quick Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/besoeasy/NostrPress&env=NPUB&envDescription=Your%20Nostr%20public%20key%20(npub1...)&project-name=nostrpress-blog)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/besoeasy/NostrPress)
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/besoeasy/NostrPress)
 
-Click the button above to deploy to Vercel. You'll be prompted to enter your `NPUB`.
+Click a button above to deploy. You'll be prompted to enter your `NPUB`.
 
 ## Build
 
