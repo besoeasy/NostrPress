@@ -25,22 +25,50 @@
     <link rel="stylesheet" href="/css/site.css" />
   </head>
   <body class="bg-slate-950 text-slate-100">
-    <header class="border-b border-slate-800">
-      <div class="mx-auto max-w-4xl px-6 py-6">
-        <a href="/" class="text-2xl font-semibold text-white">{{ site.title }}</a>
-        <p class="mt-2 text-slate-300">{{ site.description }}</p>
-      </div>
-    </header>
+    <div class="flex min-h-screen">
+      <!-- Sidebar: 1/4 width, sticky -->
+      <aside class="w-1/4 border-r border-slate-800 p-6 sticky top-0 h-screen overflow-y-auto">
+        <div class="space-y-6">
+          <div>
+            <a href="/" class="text-2xl font-semibold text-white hover:text-slate-300 transition-colors">{{ site.title }}</a>
+            <p class="mt-2 text-sm text-slate-400">{{ site.description }}</p>
+          </div>
 
-    <main class="mx-auto max-w-4xl px-6 py-10">
-      {% block content %}{% endblock %}
-    </main>
+          {% if author %}
+          <div class="pt-6 border-t border-slate-800">
+            {% if author.profile.picture %}
+              <img class="h-20 w-20 rounded-full object-cover mb-4" src="{{ author.profile.picture }}" alt="Profile picture" />
+            {% endif %}
+            <h2 class="text-lg font-semibold text-white">{{ author.profile.display_name or author.profile.name or 'Author' }}</h2>
+            {% if author.profile.about %}
+              <p class="mt-2 text-sm text-slate-300 line-clamp-4">{{ author.profile.about }}</p>
+            {% endif %}
+            {% if author.npub %}
+              <p class="mt-3 text-xs text-slate-500 break-all">{{ author.npub }}</p>
+            {% endif %}
+          </div>
+          {% endif %}
 
-    <footer class="border-t border-slate-800">
-      <div class="mx-auto max-w-4xl px-6 py-6 text-sm text-slate-400">
-        <p>Generated from Nostr using <a href="https://github.com/besoeasy/NostrPress" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-white underline">Nostr2Blog</a></p>
+          <nav class="pt-6 border-t border-slate-800">
+            <ul class="space-y-2 text-sm">
+              <li><a href="/" class="text-slate-300 hover:text-white transition-colors">Home</a></li>
+              <li><a href="/author/" class="text-slate-300 hover:text-white transition-colors">About</a></li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Main content: 3/4 width -->
+      <div class="w-3/4 flex flex-col">
+        <main class="flex-1 px-8 py-10">
+          {% block content %}{% endblock %}
+        </main>
+
+        <footer class="border-t border-slate-800 px-8 py-6">
+          <p class="text-sm text-slate-400">Generated from Nostr using <a href="https://github.com/besoeasy/NostrPress" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-white underline">Nostr2Blog</a></p>
+        </footer>
       </div>
-    </footer>
+    </div>
 
     <script src="/js/site.js" defer></script>
   </body>

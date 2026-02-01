@@ -7,30 +7,33 @@
 {% set ogImage = author.profile.picture or "" %}
 
 {% block content %}
-  <section class="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-    <div class="flex items-center gap-4">
-      {% if author.profile.picture %}
-        <img class="h-16 w-16 rounded-full object-cover" src="{{ author.profile.picture }}" alt="Profile picture" />
-      {% endif %}
-      <div>
-        <h1 class="text-2xl font-semibold text-white">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
-        <p class="text-sm text-slate-400">{{ author.npub }}</p>
+  <div class="max-w-4xl">
+    <div class="rounded-lg border border-slate-800 bg-slate-900/30 p-8 mb-10">
+      <div class="flex items-start gap-6">
+        {% if author.profile.picture %}
+          <img class="h-24 w-24 rounded-full object-cover flex-shrink-0" src="{{ author.profile.picture }}" alt="Profile picture" />
+        {% endif %}
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-white">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
+          <p class="text-sm text-slate-400 mt-2">{{ author.npub }}</p>
+          {% if author.profile.about %}
+            <p class="mt-4 text-slate-200">{{ author.profile.about }}</p>
+          {% endif %}
+        </div>
       </div>
     </div>
-    {% if author.profile.about %}
-      <p class="mt-4 text-slate-200">{{ author.profile.about }}</p>
-    {% endif %}
-  </section>
 
-  <div class="mt-8 space-y-6">
-    {% for article in articles %}
-      <article class="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-        <h2 class="text-2xl font-semibold text-white">
-          <a href="/{{ article.slug }}.html">{{ article.title }}</a>
-        </h2>
-        <p class="mt-2 text-sm text-slate-400">{{ (article.published_at * 1000) | date("Y-m-d") }}</p>
-        <p class="mt-3 text-slate-200">{{ article.summary }}</p>
-      </article>
-    {% endfor %}
+    <h2 class="text-2xl font-bold text-white mb-6">All Articles</h2>
+    <div class="space-y-4">
+      {% for article in articles %}
+        <article class="rounded-lg border border-slate-800 bg-slate-900/30 p-6 hover:bg-slate-900/50 transition-colors">
+          <h3 class="text-xl font-semibold text-white">
+            <a href="/{{ article.slug }}.html" class="hover:text-slate-300 transition-colors">{{ article.title }}</a>
+          </h3>
+          <p class="mt-2 text-sm text-slate-400">{{ (article.published_at * 1000) | date("Y-m-d") }}</p>
+          <p class="mt-3 text-slate-200">{{ article.summary }}</p>
+        </article>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}
