@@ -7,6 +7,37 @@
 {% set ogImage = article.image or "" %}
 
 {% block content %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ article.title | dump | safe }},
+  "image": [
+    {% if article.image %}"{{ article.image }}"{% endif %}
+  ],
+  "datePublished": "{{ (article.published_at * 1000) | date('iso') }}",
+  {% if article.modified_at %}"dateModified": "{{ (article.modified_at * 1000) | date('iso') }}",{% else %}"dateModified": "{{ (article.published_at * 1000) | date('iso') }}",{% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "{{ author.profile.display_name or author.profile.name }}",
+    "url": "{{ site.base_url }}/" 
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.title }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ author.profile.picture }}"
+    }
+  },
+  {% if article.summary %}"description": {{ article.summary | dump | safe }},{% endif %}
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ canonicalUrl }}"
+  }
+}
+</script>
+
   <article class="space-y-12" itemscope itemtype="https://schema.org/BlogPosting">
     <meta itemprop="headline" content="{{ article.title }}" />
     <meta itemprop="description" content="{{ pageDescription }}" />
