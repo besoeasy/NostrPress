@@ -1,6 +1,28 @@
 # NostrPress
 
+## About Nostr
+
+Nostr (Notes and Other Stuff Transmitted by Relays) is an open protocol for decentralized social apps. It aims to replace chat, microblogging, and full blogging with a simple, interoperable spec.
+
+Links:
+- https://nostr.com
+- https://github.com/nostr-protocol/nostr
+
+## What is NostrPress?
+
 Generate a modern static blog from your Nostr long-form posts (kind 30023).
+
+### Why
+
+Blogs on Nostr are great, but they have drawbacks:
+- Discoverability is limited to relay coverage and client UX.
+- SEO is weak compared to traditional sites.
+- Media hosting can be unreliable or fragmented.
+- Long-term archiving depends on relay retention policies.
+
+Since Medium is not great and is full of ads, the best option is to self-host your blog. The problem: you have to manage hosting, themes, SEO, RSS, media, and deployment.
+
+So we built NostrPress. It takes your blogs (also called articles) from Nostr and builds a static blog from them. That means you get your content in two places: on the Nostr network and on a SEO-optimized, full static website.
 
 ## Quick Deploy
 
@@ -41,10 +63,14 @@ No configuration needed - works standalone.
 
 ## Features
 
-- 📝 Pulls long-form posts from Nostr
+- 📝 Pulls long-form posts (kind 30023) and optional kind 1 notes
+- 🧾 Reads profile metadata for title and description
+- 🧭 Tags and tag archive pages
+- 🗂️ Slug generation and summaries
+- 🖼️ Featured images + media download, size limits, and de-duplication
+- 💬 Nostr comments (kind 1 replies) with author metadata
+- ⏱️ Reading time, word count, excerpts, and related posts
+- 📰 RSS feed and sitemap
 - 🎨 Modern, responsive design
-- 🖼️ Featured images
-- 💬 Comments support
-- 🏷️ Tags & categories
 - 📱 Mobile-friendly
 - ⚡ Fast static HTML
