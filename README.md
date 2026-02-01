@@ -4,7 +4,7 @@ Generate a modern static blog from your Nostr long-form posts (kind 30023).
 
 ## Quick Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/besoeasy/NostrPress&env=NPUB
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/besoeasy/NostrPress&env=NPUB&envDescription=Your%20Nostr%20public%20key%20(npub1...)&project-name=nostrpress-blog)
 
 Click the button above to deploy to Vercel. You'll be prompted to enter your `NPUB`.
 
