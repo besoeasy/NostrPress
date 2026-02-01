@@ -4,9 +4,8 @@
   "type": "module",
   "scripts": {
     "generate": "tsx src/cli.ts",
-    "build:css": "tailwindcss -c tailwind.config.cjs -i ./src/styles/tailwind.css -o ./dist/css/site.css",
     "build": "rimraf dist && tsx src/cli.ts && tailwindcss -c tailwind.config.cjs -i ./src/styles/tailwind.css -o ./dist/css/site.css",
-    "dev": "serve dist -p 3000",
+    "dev": "npm run build && serve dist -p 3000",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

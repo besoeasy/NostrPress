@@ -7,21 +7,49 @@
 {% set ogImage = "" %}
 
 {% block content %}
-  <div class="max-w-4xl">
-    <h1 class="text-3xl font-bold text-white mb-8">Latest Articles</h1>
-    <div class="space-y-6">
+  <div class="space-y-12">
+    <header>
+      <h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white mb-4">Latest</h1>
+      <div class="h-1 w-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></div>
+    </header>
+
+    <div class="space-y-8">
       {% for article in articles %}
-        <article class="rounded-lg border border-slate-800 bg-slate-900/30 p-6 hover:bg-slate-900/50 transition-colors">
-          <h2 class="text-2xl font-semibold text-white">
-            <a href="/{{ article.slug }}.html" class="hover:text-slate-300 transition-colors">{{ article.title }}</a>
-          </h2>
-          <p class="mt-2 text-sm text-slate-400">{{ (article.published_at * 1000) | date("Y-m-d") }}</p>
-          <p class="mt-3 text-slate-200">{{ article.summary }}</p>
-          <div class="mt-4 flex flex-wrap gap-2">
-            {% for tag in article.tags %}
-              <a href="/tags/{{ tag }}/" class="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-200 hover:bg-slate-700 transition-colors">#{{ tag }}</a>
-            {% endfor %}
-          </div>
+        <article class="group relative">
+          <a href="/{{ article.slug }}.html" class="block">
+            <div class="relative rounded-2xl border border-slate-800/50 bg-gradient-to-br from-slate-900/40 to-slate-900/20 backdrop-blur-sm p-8 lg:p-10 transition-all duration-500 ease-out hover:border-slate-700/80 hover:shadow-2xl hover:shadow-cyan-500/5 hover:-translate-y-1">
+              <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/0 to-blue-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+              
+              <div class="relative space-y-4">
+                <div class="flex items-center gap-3">
+                  <time class="text-sm font-medium text-slate-500 tracking-wide">{{ (article.published_at * 1000) | date("Y-m-d") }}</time>
+                  {% if article.tags.length %}
+                    <span class="text-slate-700">•</span>
+                    <div class="flex flex-wrap gap-2">
+                      {% for tag in article.tags | slice(0, 2) %}
+                        <span class="text-xs font-medium text-cyan-400/80">#{{ tag }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+                
+                <h2 class="text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all duration-300">
+                  {{ article.title }}
+                </h2>
+                
+                {% if article.summary %}
+                  <p class="text-base lg:text-lg text-slate-400 leading-relaxed line-clamp-2">{{ article.summary }}</p>
+                {% endif %}
+                
+                <div class="flex items-center gap-2 text-cyan-400/80 group-hover:text-cyan-400 transition-colors duration-300">
+                  <span class="text-sm font-medium">Read article</span>
+                  <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </a>
         </article>
       {% endfor %}
     </div>

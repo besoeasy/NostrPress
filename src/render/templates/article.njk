@@ -7,40 +7,54 @@
 {% set ogImage = article.image or "" %}
 
 {% block content %}
-  <article class="prose prose-invert max-w-3xl">
-    <h1>{{ article.title }}</h1>
-    <p class="text-sm text-slate-400">{{ (article.published_at * 1000) | date("Y-m-d") }}</p>
-    <div class="mt-6">{{ article.html | safe }}</div>
+  <article class="space-y-12">
+    <header class="space-y-6 pb-12 border-b border-slate-800/50">
+      <div class="space-y-4">
+        <time class="inline-block text-sm font-medium text-slate-500 tracking-wide">{{ (article.published_at * 1000) | date("Y-m-d") }}</time>
+        <h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight">{{ article.title }}</h1>
+      </div>
+      
+      {% if article.tags.length %}
+        <div class="flex flex-wrap gap-2">
+          {% for tag in article.tags %}
+            <a href="/tags/{{ tag }}/" class="group relative inline-flex items-center rounded-full border border-slate-800/50 bg-slate-900/30 px-4 py-2 text-sm font-medium text-slate-300 hover:border-cyan-500/50 hover:bg-slate-900/50 hover:text-cyan-400 transition-all duration-300">
+              <span class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/0 to-blue-500/0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+              <span class="relative">#{{ tag }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="prose prose-invert prose-lg xl:prose-xl max-w-none">
+      {{ article.html | safe }}
+    </div>
   </article>
 
-  {% if article.tags.length %}
-    <div class="mt-8 flex flex-wrap gap-2">
-      {% for tag in article.tags %}
-        <a href="/tags/{{ tag }}/" class="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-200">#{{ tag }}</a>
-      {% endfor %}
-    </div>
-  {% endif %}
-
   {% if article.comments.length %}
-    <section class="mt-16 border-t border-slate-800 pt-8 max-w-3xl">
-      <h2 class="text-2xl font-semibold text-white mb-6">Comments ({{ article.comments.length }})</h2>
-      <div class="space-y-4">
+    <section class="mt-20 pt-16 border-t border-slate-800/50 space-y-8">
+      <div class="space-y-2">
+        <h2 class="text-3xl lg:text-4xl font-bold tracking-tight text-white">Comments</h2>
+        <p class="text-slate-500">{{ article.comments.length }} {{ 'comment' if article.comments.length == 1 else 'comments' }}</p>
+      </div>
+      
+      <div class="space-y-6">
         {% for comment in article.comments %}
-          <div class="rounded-lg border border-slate-800 bg-slate-900/30 p-4">
-            <div class="flex items-start gap-3">
+          <div class="group rounded-2xl border border-slate-800/50 bg-gradient-to-br from-slate-900/30 to-slate-900/20 p-6 hover:border-slate-700/80 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300">
+            <div class="flex items-start gap-4">
               {% if comment.author_picture %}
-                <img src="{{ comment.author_picture }}" alt="{{ comment.author_name or 'Anonymous' }}" class="w-10 h-10 rounded-full" loading="lazy" />
+                <img src="{{ comment.author_picture }}" alt="{{ comment.author_name or 'Anonymous' }}" class="w-12 h-12 rounded-full ring-2 ring-slate-800/50 group-hover:ring-slate-700/80 transition-all duration-300" loading="lazy" />
               {% else %}
-                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 text-sm">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-slate-400 text-sm font-medium ring-2 ring-slate-800/50 group-hover:ring-slate-700/80 transition-all duration-300">
                   {{ (comment.author_name or comment.pubkey)[0] | upper }}
                 </div>
               {% endif %}
-              <div class="flex-1 min-w-0">
-                <div class="flex items-baseline gap-2 mb-1">
-                  <span class="font-medium text-slate-200">{{ comment.author_name or comment.pubkey.slice(0, 8) + '...' }}</span>
-                  <span class="text-xs text-slate-500">{{ (comment.created_at * 1000) | date("Y-m-d") }}</span>
+              <div class="flex-1 min-w-0 space-y-2">
+                <div class="flex items-baseline gap-3">
+                  <span class="font-semibold text-slate-200">{{ comment.author_name or comment.pubkey.slice(0, 8) + '...' }}</span>
+                  <time class="text-xs font-medium text-slate-500">{{ (comment.created_at * 1000) | date("Y-m-d") }}</time>
                 </div>
-                <p class="text-slate-300 whitespace-pre-wrap break-words">{{ comment.content }}</p>
+                <p class="text-base text-slate-300 whitespace-pre-wrap break-words leading-relaxed">{{ comment.content }}</p>
               </div>
             </div>
           </div>

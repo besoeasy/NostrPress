@@ -4,18 +4,111 @@
 
 @layer base {
   body {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
 @layer components {
+  /* Prose styling for article content */
+  .prose {
+    @apply text-slate-300;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply font-bold tracking-tight text-white;
+  }
+  
+  .prose h1 {
+    @apply text-4xl lg:text-5xl mt-12 mb-6;
+  }
+  
+  .prose h2 {
+    @apply text-3xl lg:text-4xl mt-10 mb-5;
+  }
+  
+  .prose h3 {
+    @apply text-2xl lg:text-3xl mt-8 mb-4;
+  }
+  
+  .prose p {
+    @apply text-base lg:text-lg leading-relaxed my-6;
+  }
+  
   .prose a {
-    @apply text-cyan-300 hover:text-cyan-200;
+    @apply text-cyan-400 hover:text-cyan-300 underline decoration-cyan-500/30 underline-offset-4 hover:decoration-cyan-400/50 transition-all duration-200;
   }
-  .prose pre {
-    @apply bg-slate-900/70 border border-slate-800 rounded-lg p-4 overflow-x-auto;
+  
+  .prose strong {
+    @apply font-semibold text-white;
   }
+  
+  .prose em {
+    @apply italic text-slate-200;
+  }
+  
   .prose code {
-    @apply text-cyan-200;
+    @apply text-cyan-300 bg-slate-900/50 px-2 py-1 rounded text-sm font-mono;
+  }
+  
+  .prose pre {
+    @apply bg-gradient-to-br from-slate-900/80 to-slate-900/60 border border-slate-800/50 rounded-2xl p-6 overflow-x-auto my-8 shadow-2xl;
+  }
+  
+  .prose pre code {
+    @apply bg-transparent px-0 py-0 text-slate-300;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-cyan-500/50 pl-6 py-2 my-8 italic text-slate-400 bg-slate-900/30 rounded-r-xl;
+  }
+  
+  .prose ul, .prose ol {
+    @apply my-6 space-y-2;
+  }
+  
+  .prose li {
+    @apply text-base lg:text-lg leading-relaxed;
+  }
+  
+  .prose img {
+    @apply rounded-2xl shadow-2xl my-8 border border-slate-800/50;
+  }
+  
+  .prose hr {
+    @apply border-slate-800/50 my-12;
+  }
+  
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-6 {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
+

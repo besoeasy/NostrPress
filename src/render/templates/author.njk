@@ -7,33 +7,63 @@
 {% set ogImage = author.profile.picture or "" %}
 
 {% block content %}
-  <div class="max-w-4xl">
-    <div class="rounded-lg border border-slate-800 bg-slate-900/30 p-8 mb-10">
-      <div class="flex items-start gap-6">
+  <div class="space-y-12">
+    <header class="rounded-3xl border border-slate-800/50 bg-gradient-to-br from-slate-900/40 to-slate-900/20 backdrop-blur-sm p-10 lg:p-12">
+      <div class="flex flex-col lg:flex-row items-start gap-8">
         {% if author.profile.picture %}
-          <img class="h-24 w-24 rounded-full object-cover flex-shrink-0" src="{{ author.profile.picture }}" alt="Profile picture" />
+          <div class="relative group">
+            <div class="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full opacity-20 blur-lg group-hover:opacity-30 transition-opacity duration-500"></div>
+            <img class="relative h-32 w-32 lg:h-40 lg:w-40 rounded-full object-cover ring-4 ring-slate-800/50 transition-transform duration-300 group-hover:scale-105" src="{{ author.profile.picture }}" alt="Profile picture" />
+          </div>
         {% endif %}
-        <div class="flex-1">
-          <h1 class="text-3xl font-bold text-white">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
-          <p class="text-sm text-slate-400 mt-2">{{ author.npub }}</p>
+        <div class="flex-1 space-y-4">
+          <div class="space-y-2">
+            <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-white">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
+            <p class="text-sm font-mono text-slate-500">{{ author.npub }}</p>
+          </div>
           {% if author.profile.about %}
-            <p class="mt-4 text-slate-200">{{ author.profile.about }}</p>
+            <p class="text-base lg:text-lg text-slate-300 leading-relaxed max-w-3xl">{{ author.profile.about }}</p>
           {% endif %}
         </div>
       </div>
-    </div>
+    </header>
 
-    <h2 class="text-2xl font-bold text-white mb-6">All Articles</h2>
-    <div class="space-y-4">
-      {% for article in articles %}
-        <article class="rounded-lg border border-slate-800 bg-slate-900/30 p-6 hover:bg-slate-900/50 transition-colors">
-          <h3 class="text-xl font-semibold text-white">
-            <a href="/{{ article.slug }}.html" class="hover:text-slate-300 transition-colors">{{ article.title }}</a>
-          </h3>
-          <p class="mt-2 text-sm text-slate-400">{{ (article.published_at * 1000) | date("Y-m-d") }}</p>
-          <p class="mt-3 text-slate-200">{{ article.summary }}</p>
-        </article>
-      {% endfor %}
+    <div class="space-y-6">
+      <div class="flex items-center gap-3">
+        <h2 class="text-3xl font-bold tracking-tight text-white">All Articles</h2>
+        <div class="h-1 w-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></div>
+      </div>
+      
+      <div class="space-y-6">
+        {% for article in articles %}
+          <article class="group relative">
+            <a href="/{{ article.slug }}.html" class="block">
+              <div class="relative rounded-2xl border border-slate-800/50 bg-gradient-to-br from-slate-900/40 to-slate-900/20 backdrop-blur-sm p-8 transition-all duration-500 ease-out hover:border-slate-700/80 hover:shadow-2xl hover:shadow-cyan-500/5 hover:-translate-y-1">
+                <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/0 to-blue-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+                
+                <div class="relative space-y-3">
+                  <time class="text-sm font-medium text-slate-500 tracking-wide">{{ (article.published_at * 1000) | date("Y-m-d") }}</time>
+                  
+                  <h3 class="text-2xl lg:text-3xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all duration-300">
+                    {{ article.title }}
+                  </h3>
+                  
+                  {% if article.summary %}
+                    <p class="text-base text-slate-400 leading-relaxed line-clamp-2">{{ article.summary }}</p>
+                  {% endif %}
+                  
+                  <div class="flex items-center gap-2 text-cyan-400/80 group-hover:text-cyan-400 transition-colors duration-300">
+                    <span class="text-sm font-medium">Read article</span>
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
     </div>
   </div>
 {% endblock %}
