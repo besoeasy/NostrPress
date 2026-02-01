@@ -1,5 +1,5 @@
 {
-  "name": "nostr2blog",
+  "name": "nostrpress",
   "private": true,
   "type": "module",
   "scripts": {
