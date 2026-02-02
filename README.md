@@ -1,6 +1,6 @@
 # NostrPress
 
-Generate a modern static blog from your Nostr long-form posts (kind 30023). Publish once on Nostr, get a SEO-optimized website automatically.
+Generate a modern static blog from your [Nostr](https://github.com/nostr-protocol/nostr) long-form posts (kind 30023). Publish once on Nostr, get a SEO-optimized website automatically.
 
 ## Quick Start
 
@@ -12,8 +12,11 @@ Generate a modern static blog from your Nostr long-form posts (kind 30023). Publ
 **Option 2: Run with npx**
 
 ```bash
-NPUB=your_npub npx github:besoeasy/NostrPress
+NPUB=your_npub BASE_URL=https://yourdomain.com npx github:besoeasy/NostrPress
 ```
+
+Generates a static site in `./dist` folder. Deploy to any hosting platform or browse locally.
+
 
 ## Configuration
 
