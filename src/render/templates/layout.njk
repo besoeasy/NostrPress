@@ -14,13 +14,13 @@
     {% endif %}
     
     <!-- Favicon and Icons -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/x-icon" href="{{ site.base_url }}/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ site.base_url }}/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ site.base_url }}/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ site.base_url }}/favicon-16x16.png" />
     
     <!-- RSS Feed -->
-    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS Feed" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS Feed" href="{{ site.base_url }}/rss.xml" />
 
     <!-- Open Graph / Facebook / Telegram / WhatsApp -->
     <meta property="og:title" content="{{ pageTitle }}" />
@@ -80,8 +80,8 @@
 
     {% block additionalHead %}{% endblock %}
 
-    <link rel="stylesheet" href="/css/site.css" />
-    <link rel="stylesheet" href="/css/print.css" media="print" />
+    <link rel="stylesheet" href="{{ site.base_url }}/css/site.css" />
+    <link rel="stylesheet" href="{{ site.base_url }}/css/print.css" media="print" />
     <script>
       // Auto-detect canonical URL and OG URL if not set at build time
       if (!document.querySelector('link[rel="canonical"]')) {
@@ -140,7 +140,7 @@
               {% endif %}
               
               <div class="space-y-2">
-                <a href="/" class="block group">
+                <a href="{{ site.base_url }}/" class="block group">
                   <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
                     {{ author.profile.display_name or author.profile.name or site.title }}
                   </h1>
@@ -193,7 +193,7 @@
           {% else %}
             <!-- Site Info Fallback (No Author) -->
             <div class="text-center space-y-4">
-              <a href="/" class="block group">
+              <a href="{{ site.base_url }}/" class="block group">
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
                   {{ site.title }}
                 </h1>
@@ -225,7 +225,7 @@
       <!-- Mobile Header -->
       <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200">
         <div class="px-6 py-4">
-          <a href="/" class="text-2xl font-bold tracking-tight text-slate-900" aria-label="Home">{{ site.title }}</a>
+          <a href="{{ site.base_url }}/" class="text-2xl font-bold tracking-tight text-slate-900" aria-label="Home">{{ site.title }}</a>
         </div>
       </div>
 
@@ -245,6 +245,6 @@
       </div>
     </div>
 
-    <script src="/js/site.js" defer></script>
+    <script src="{{ site.base_url }}/js/site.js" defer></script>
   </body>
 </html>

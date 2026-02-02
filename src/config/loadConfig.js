@@ -10,13 +10,13 @@ export function loadConfig(cliBaseUrl) {
   // 2. SITE_URL (Netlify/Vercel)
   // 3. PUBLIC_URL (some hosting providers)
   // 4. BASE_URL (optional .env)
-  // 5. Empty string (will be set client-side)
+  // 5. Dot (relative path for local browsing)
   const baseUrl = 
     cliBaseUrl || 
     process.env.SITE_URL || 
     process.env.PUBLIC_URL || 
     process.env.BASE_URL || 
-    "";
+    ".";
   
   const maxSizeMb = process.env.MAX_SIZE_MB ? Number(process.env.MAX_SIZE_MB) : defaultConfig.media.max_size_mb;
 

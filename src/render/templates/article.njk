@@ -88,7 +88,7 @@
       {% if article.tags.length %}
         <div class="flex flex-wrap gap-2" aria-label="Article tags">
           {% for tag in article.tags %}
-            <a href="/tags/{{ tag }}/" class="group relative inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300" itemprop="keywords">
+            <a href="{{ site.base_url }}/tags/{{ tag }}/" class="group relative inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300" itemprop="keywords">
               <span class="relative">#{{ tag }}</span>
             </a>
           {% endfor %}
@@ -167,12 +167,12 @@
         {% for related in relatedArticles %}
           <article class="group rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
             {% if related.image %}
-              <a href="/{{ related.slug }}.html" class="block relative h-48 overflow-hidden">
+              <a href="{{ site.base_url }}/{{ related.slug }}.html" class="block relative h-48 overflow-hidden">
                 <img src="{{ related.image }}" alt="{{ related.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
               </a>
             {% endif %}
             <div class="p-6 space-y-3">
-              <a href="/{{ related.slug }}.html" class="block">
+              <a href="{{ site.base_url }}/{{ related.slug }}.html" class="block">
                 <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">{{ related.title }}</h3>
               </a>
               {% if related.excerpt %}

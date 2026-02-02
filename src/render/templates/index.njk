@@ -81,7 +81,7 @@
     <div class="space-y-8">
       {% for article in articles %}
         <article class="group relative">
-          <a href="/{{ article.slug }}.html" class="block">
+          <a href="{{ site.base_url }}/{{ article.slug }}.html" class="block">
             <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1">
               <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
               
