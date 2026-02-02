@@ -2,9 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { extension as mimeExtension } from "mime-types";
-import { Article, Config, MediaAsset } from "../types.js";
 import { discoverMediaUrls } from "./mediaScan.js";
-import { CacheManager } from "../cache/cacheManager.ts";
+import { CacheManager } from "../cache/cacheManager.js";
 
 const mediaCache = new CacheManager("nostr-cache/media-map.json", 24 * 365); // Long cache for media (1 year)
 
@@ -37,12 +36,7 @@ const COMMON_EXTENSIONS = new Set([
   "ogg"
 ]);
 
-interface MediaResult {
-  assets: MediaAsset[];
-  urlMap: Map<string, string>;
-}
-
-function matchMime(allowed: string[], mime: string): boolean {
+function matchMime(allowed, mime) {
   for (const pattern of allowed) {
     if (pattern.endsWith("/*")) {
       const prefix = pattern.replace("/*", "");
@@ -54,19 +48,19 @@ function matchMime(allowed: string[], mime: string): boolean {
   return false;
 }
 
-function getTimeoutSignal(ms: number): AbortSignal {
+function getTimeoutSignal(ms) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), ms);
-  (controller.signal as any).timeoutId = timeout;
+  controller.signal.timeoutId = timeout;
   return controller.signal;
 }
 
-function clearTimeoutSignal(signal: AbortSignal) {
-  const timeoutId = (signal as any).timeoutId as NodeJS.Timeout | undefined;
+function clearTimeoutSignal(signal) {
+  const timeoutId = signal.timeoutId;
   if (timeoutId) clearTimeout(timeoutId);
 }
 
-async function headRequest(url: string, timeoutMs: number): Promise<{ mime?: string; length?: number }> {
+async function headRequest(url, timeoutMs) {
   const signal = getTimeoutSignal(timeoutMs);
   try {
     const res = await fetch(url, { method: "HEAD", signal });
@@ -81,7 +75,7 @@ async function headRequest(url: string, timeoutMs: number): Promise<{ mime?: str
   }
 }
 
-async function download(url: string, timeoutMs: number, maxBytes: number): Promise<{ buffer: Buffer; mime?: string }> {
+async function download(url, timeoutMs, maxBytes) {
   const signal = getTimeoutSignal(timeoutMs);
   try {
     const res = await fetch(url, { method: "GET", signal });
@@ -100,11 +94,11 @@ async function download(url: string, timeoutMs: number, maxBytes: number): Promi
   }
 }
 
-function computeHash(buffer: Buffer): string {
+function computeHash(buffer) {
   return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
-function resolveAssetPath(mime: string, hash: string, outputDir: string): { localPath: string; publicPath: string } {
+function resolveAssetPath(mime, hash, outputDir) {
   const ext = mimeExtension(mime) || "bin";
   const isVideo = mime.startsWith("video/");
   const folder = isVideo ? "videos" : "images";
@@ -114,7 +108,7 @@ function resolveAssetPath(mime: string, hash: string, outputDir: string): { loca
   return { localPath, publicPath };
 }
 
-function normalizeUrl(rawUrl: string): string | null {
+function normalizeUrl(rawUrl) {
   if (!rawUrl) return null;
   const cleaned = rawUrl
     .replace(/&gt;$/g, "")
@@ -129,7 +123,7 @@ function normalizeUrl(rawUrl: string): string | null {
   }
 }
 
-function isLikelyMediaUrl(url: string): boolean {
+function isLikelyMediaUrl(url) {
   try {
     const parsed = new URL(url);
     const pathname = parsed.pathname.toLowerCase();
@@ -140,20 +134,20 @@ function isLikelyMediaUrl(url: string): boolean {
   }
 }
 
-export async function processMedia(articles: Article[], config: Config): Promise<MediaResult> {
+export async function processMedia(articles, config) {
   if (!config.media.download) {
     return { assets: [], urlMap: new Map() };
   }
 
-  const urlMap = new Map<string, string>();
-  const assets: MediaAsset[] = [];
-  const seenHashes = new Set<string>();
+  const urlMap = new Map();
+  const assets = [];
+  const seenHashes = new Set();
 
   // Ensure persistent cache directory exists
   const PERSISTENT_CACHE_DIR = path.resolve(process.cwd(), "nostr-cache", "media");
   fs.mkdirSync(PERSISTENT_CACHE_DIR, { recursive: true });
 
-  const allUrls = new Set<string>();
+  const allUrls = new Set();
   for (const article of articles) {
     for (const url of discoverMediaUrls(article)) {
       const normalized = normalizeUrl(url);
@@ -168,7 +162,7 @@ export async function processMedia(articles: Article[], config: Config): Promise
   for (const url of allUrls) {
     try {
       // Check cache map first
-      const cached = mediaCache.get<{ hash: string; mime: string }>(url);
+      const cached = mediaCache.get(url);
       
       if (cached) {
         const ext = mimeExtension(cached.mime) || "bin";
@@ -248,7 +242,7 @@ export async function processMedia(articles: Article[], config: Config): Promise
   return { assets, urlMap };
 }
 
-export function rewriteArticleContent(article: Article, urlMap: Map<string, string>): Article {
+export function rewriteArticleContent(article, urlMap) {
   let content = article.content;
   for (const [original, replacement] of urlMap) {
     content = content.split(original).join(replacement);

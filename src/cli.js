@@ -10,11 +10,10 @@ import { resolveIdentity, fetchProfileMetadata, fetchArticles, fetchComments } f
 import { parseArticle } from "./parser/articleParser.js";
 import { processMedia, rewriteArticleContent } from "./media/mediaPipeline.js";
 import { renderMarkdown, renderSite } from "./render/render.js";
-import { Article, Config, RenderContext } from "./types.js";
 
-function parseArgs(): { baseUrl?: string } {
+function parseArgs() {
   const args = process.argv.slice(2);
-  let baseUrl: string | undefined;
+  let baseUrl;
   
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--base-url" && i + 1 < args.length) {
@@ -28,11 +27,11 @@ function parseArgs(): { baseUrl?: string } {
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-function ensureDir(dir: string) {
+function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-function cleanOutput(outputDir: string) {
+function cleanOutput(outputDir) {
   ensureDir(outputDir);
   ensureDir(path.join(outputDir, "assets", "images"));
   ensureDir(path.join(outputDir, "assets", "videos"));
@@ -40,7 +39,7 @@ function cleanOutput(outputDir: string) {
   ensureDir(path.join(outputDir, "js"));
 }
 
-function normalizeSummary(content: string, summary?: string): string {
+function normalizeSummary(content, summary) {
   if (summary && summary.trim()) return summary;
   const text = content
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
@@ -51,14 +50,14 @@ function normalizeSummary(content: string, summary?: string): string {
   return text.slice(0, 180);
 }
 
-function sortArticles(articles: Article[]): Article[] {
+function sortArticles(articles) {
   return [...articles].sort((a, b) => {
     if (b.published_at !== a.published_at) return b.published_at - a.published_at;
     return a.id.localeCompare(b.id);
   });
 }
 
-function buildContext(config: Config, npub: string, pubkey: string, profile: any, articles: Article[]): RenderContext {
+function buildContext(config, npub, pubkey, profile, articles) {
   const siteTitle = config.site.title === "auto" ? profile.display_name || profile.name || npub : config.site.title;
   const siteDescription =
     config.site.description === "auto" ? profile.about || `Posts by ${siteTitle}` : config.site.description;
@@ -78,7 +77,7 @@ function buildContext(config: Config, npub: string, pubkey: string, profile: any
   };
 }
 
-function writeStaticAssets(outputDir: string, rootDir: string) {
+function writeStaticAssets(outputDir, rootDir) {
   const srcJs = path.join(rootDir, "src/static/site.js");
   const destJs = path.join(outputDir, "js", "site.js");
   if (fs.existsSync(srcJs)) {
@@ -95,7 +94,7 @@ function writeStaticAssets(outputDir: string, rootDir: string) {
   }
 }
 
-function runTailwind(outputDir: string, rootDir: string) {
+function runTailwind(outputDir, rootDir) {
   const require = createRequire(import.meta.url);
   const tailwindCli = require.resolve("tailwindcss/lib/cli.js");
   const input = path.join(rootDir, "src/styles/tailwind.css");
@@ -108,7 +107,7 @@ function runTailwind(outputDir: string, rootDir: string) {
   });
 }
 
-function generateRss(context: RenderContext, outputDir: string) {
+function generateRss(context, outputDir) {
   const items = context.articles
     .map((article) => {
       const url = `${context.site.base_url}/${article.slug}.html`;
@@ -121,8 +120,8 @@ function generateRss(context: RenderContext, outputDir: string) {
   fs.writeFileSync(path.join(outputDir, "rss.xml"), rss);
 }
 
-function generateSitemap(context: RenderContext, outputDir: string) {
-  const urls: string[] = [];
+function generateSitemap(context, outputDir) {
+  const urls = [];
   urls.push(`${context.site.base_url}/`);
   urls.push(`${context.site.base_url}/author/`);
 
@@ -130,7 +129,7 @@ function generateSitemap(context: RenderContext, outputDir: string) {
     urls.push(`${context.site.base_url}/${article.slug}.html`);
   }
 
-  const tagSet = new Set<string>();
+  const tagSet = new Set();
   for (const article of context.articles) {
     for (const tag of article.tags) tagSet.add(tag);
   }

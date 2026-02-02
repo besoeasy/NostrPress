@@ -1,7 +1,6 @@
-import { Config } from "../types.js";
 import { defaultConfig } from "./defaults.js";
 
-export function loadConfig(cliBaseUrl?: string): Config {
+export function loadConfig(cliBaseUrl) {
   const npub = process.env.NPUB || "";
   const relays = process.env.RELAYS ? process.env.RELAYS.split(",") : defaultConfig.relays;
   const outputDir = process.env.OUTPUT_DIR || defaultConfig.output_dir;

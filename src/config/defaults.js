@@ -1,6 +1,4 @@
-import { Config } from "../types.js";
-
-export const defaultConfig: Config = {
+export const defaultConfig = {
   input: {
     npub_or_nprofile: ""
   },

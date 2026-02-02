@@ -1,35 +1,23 @@
 import fs from "node:fs";
 import path from "node:path";
 
-interface CacheEntry<T> {
-  timestamp: number;
-  data: T;
-}
-
-interface CacheStore {
-  [key: string]: CacheEntry<any>;
-}
-
 export class CacheManager {
-  private cacheFile: string;
-  private cache: CacheStore = {};
-  private ttl: number;
-
-  constructor(filePath: string = "nostr-cache/data.json", ttlHours: number = 1) {
+  constructor(filePath = "nostr-cache/data.json", ttlHours = 1) {
     this.cacheFile = path.resolve(process.cwd(), filePath);
+    this.cache = {};
     this.ttl = ttlHours * 60 * 60 * 1000;
     this.ensureCacheDir();
     this.load();
   }
 
-  private ensureCacheDir() {
+  ensureCacheDir() {
     const dir = path.dirname(this.cacheFile);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
   }
 
-  private load() {
+  load() {
     if (fs.existsSync(this.cacheFile)) {
       try {
         const content = fs.readFileSync(this.cacheFile, "utf-8");
@@ -41,7 +29,7 @@ export class CacheManager {
     }
   }
 
-  private save() {
+  save() {
     try {
       fs.writeFileSync(this.cacheFile, JSON.stringify(this.cache, null, 2), "utf-8");
     } catch (error) {
@@ -49,7 +37,7 @@ export class CacheManager {
     }
   }
 
-  get<T>(key: string): T | null {
+  get(key) {
     const entry = this.cache[key];
     if (!entry) return null;
 
@@ -59,10 +47,10 @@ export class CacheManager {
         return null; 
     }
     
-    return entry.data as T;
+    return entry.data;
   }
 
-  set<T>(key: string, data: T) {
+  set(key, data) {
     this.cache[key] = {
       timestamp: Date.now(),
       data,

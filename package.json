@@ -3,19 +3,15 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "generate": "tsx src/cli.ts",
-    "build": "rimraf dist && tsx src/cli.ts",
-    "dev": "serve dist -p 3000",
-    "typecheck": "tsc --noEmit"
+    "build": "rimraf dist && node src/cli.js",
+    "dev": "serve dist -p 3000"
   },
   "bin": {
     "nostrpress": "bin/nostrpress.js"
   },
   "files": [
     "bin",
-    "src/render/templates",
-    "src/static",
-    "src/styles",
+    "src",
     "tailwind.config.cjs",
     "postcss.config.cjs",
     "README.md"
@@ -30,21 +26,14 @@
     "sanitize-html": "^2.13.0",
     "slugify": "^1.6.6",
     "tailwindcss": "^3.4.10",
-    "tsx": "^4.16.2",
     "yaml": "^2.5.1"
   },
   "devDependencies": {
-    "@types/markdown-it": "^14.1.2",
-    "@types/mime-types": "^3.0.1",
-    "@types/node": "^20.14.10",
-    "@types/nunjucks": "^3.2.6",
-    "@types/sanitize-html": "^2.11.0",
     "concurrently": "^9.1.0",
     "nodemon": "^3.1.9",
     "postcss": "^8.4.38",
     "rimraf": "^5.0.7",
-    "serve": "^14.2.4",
-    "typescript": "^5.6.2"
+    "serve": "^14.2.4"
   },
   "engines": {
     "node": ">=22"

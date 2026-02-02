@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import nunjucks from "nunjucks";
-import { Article, RenderContext } from "../types.js";
 
 const md = new MarkdownIt({
   html: false,
@@ -12,7 +11,7 @@ const md = new MarkdownIt({
   typographer: true
 });
 
-const sanitizer = (html: string) =>
+const sanitizer = (html) =>
   sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "h4", "h5", "h6"]),
     allowedAttributes: {
@@ -26,19 +25,19 @@ const sanitizer = (html: string) =>
     disallowedTagsMode: "discard"
   });
 
-export function calculateReadingTime(text: string): number {
+export function calculateReadingTime(text) {
   const wordsPerMinute = 200;
   const words = text.trim().split(/\s+/).length;
   return Math.ceil(words / wordsPerMinute);
 }
 
-export function generateExcerpt(content: string, maxLength: number = 160): string {
+export function generateExcerpt(content, maxLength = 160) {
   const plainText = content.replace(/[#*`\[\]]/g, '').trim();
   if (plainText.length <= maxLength) return plainText;
   return plainText.substring(0, maxLength).trim() + '...';
 }
 
-export function findRelatedArticles(current: Article, allArticles: Article[], limit: number = 3): Article[] {
+export function findRelatedArticles(current, allArticles, limit = 3) {
   const scored = allArticles
     .filter(a => a.id !== current.id)
     .map(article => {
@@ -53,23 +52,23 @@ export function findRelatedArticles(current: Article, allArticles: Article[], li
   return scored.slice(0, limit).map(s => s.article);
 }
 
-export function renderMarkdown(article: Article): string {
+export function renderMarkdown(article) {
   const raw = md.render(article.content);
   return sanitizer(raw);
 }
 
-function ensureDir(dir: string) {
+function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-function writeFile(target: string, content: string) {
+function writeFile(target, content) {
   ensureDir(path.dirname(target));
   fs.writeFileSync(target, content);
 }
 
-export function createRenderer(templateDir: string) {
+export function createRenderer(templateDir) {
   const env = nunjucks.configure(templateDir, { autoescape: true });
-  env.addFilter("date", (value: number, format: string) => {
+  env.addFilter("date", (value, format) => {
     const date = new Date(value);
     if (format === "Y-m-d") {
       const year = date.getUTCFullYear();
@@ -85,7 +84,7 @@ export function createRenderer(templateDir: string) {
   return env;
 }
 
-export function renderSite(context: RenderContext, outputDir: string) {
+export function renderSite(context, outputDir) {
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
   const templatesDir = path.join(packageRoot, "src/render/templates");
   const env = createRenderer(templatesDir);
@@ -102,11 +101,11 @@ export function renderSite(context: RenderContext, outputDir: string) {
   const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted });
   writeFile(path.join(outputDir, "index.html"), indexHtml);
 
-  const tagMap = new Map<string, Article[]>();
+  const tagMap = new Map();
   for (const article of articlesSorted) {
     for (const tag of article.tags) {
       if (!tagMap.has(tag)) tagMap.set(tag, []);
-      tagMap.get(tag)!.push(article);
+      tagMap.get(tag).push(article);
     }
   }
 

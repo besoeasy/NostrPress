@@ -1,10 +1,7 @@
-import { Article } from "../types.js";
-
-const markdownImageRegex = /!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g;
-const plainUrlRegex = /(https?:\/\/[^\s)\]]+)/g;
-
-export function discoverMediaUrls(article: Article): string[] {
-  const urls = new Set<string>();
+export function discoverMediaUrls(article) {
+  const markdownImageRegex = /!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g;
+  const plainUrlRegex = /(https?:\/\/[^\s)\]]+)/g;
+  const urls = new Set();
 
   for (const match of article.content.matchAll(markdownImageRegex)) {
     urls.add(match[1]);

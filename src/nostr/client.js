@@ -1,22 +1,15 @@
-import { SimplePool, nip19, Event as NostrEvent, Filter } from "nostr-tools";
-import { Config, ProfileMetadata, Comment } from "../types.js";
-import { CacheManager } from "../cache/cacheManager.ts";
+import { SimplePool, nip19 } from "nostr-tools";
+import { CacheManager } from "../cache/cacheManager.js";
 
 const cache = new CacheManager();
 
-export interface ResolvedIdentity {
-  npub: string;
-  pubkey: string;
-  relays: string[];
-}
-
-export function resolveIdentity(input: string, fallbackRelays: string[]): ResolvedIdentity {
+export function resolveIdentity(input, fallbackRelays) {
   if (input.startsWith("npub")) {
     const decoded = nip19.decode(input);
     if (decoded.type !== "npub") {
       throw new Error("Invalid npub input");
     }
-    return { npub: input, pubkey: decoded.data as string, relays: fallbackRelays };
+    return { npub: input, pubkey: decoded.data, relays: fallbackRelays };
   }
 
   if (input.startsWith("nprofile")) {
@@ -24,7 +17,7 @@ export function resolveIdentity(input: string, fallbackRelays: string[]): Resolv
     if (decoded.type !== "nprofile") {
       throw new Error("Invalid nprofile input");
     }
-    const data = decoded.data as { pubkey: string; relays?: string[] };
+    const data = decoded.data;
     const npub = nip19.npubEncode(data.pubkey);
     return { npub, pubkey: data.pubkey, relays: data.relays?.length ? data.relays : fallbackRelays };
   }
@@ -32,24 +25,24 @@ export function resolveIdentity(input: string, fallbackRelays: string[]): Resolv
   throw new Error("Input must be npub or nprofile");
 }
 
-export async function fetchProfileMetadata(pool: SimplePool, relays: string[], pubkey: string): Promise<ProfileMetadata> {
+export async function fetchProfileMetadata(pool, relays, pubkey) {
   const cacheKey = `profile-${pubkey}`;
-  const cached = cache.get<ProfileMetadata>(cacheKey);
+  const cached = cache.get(cacheKey);
   if (cached) {
     console.log(`Using cached profile for ${pubkey}`);
     return cached;
   }
 
   console.log(`Fetching profile for ${pubkey}...`);
-  const filter: Filter = { kinds: [0], authors: [pubkey], limit: 10 };
+  const filter = { kinds: [0], authors: [pubkey], limit: 10 };
   const events = await pool.querySync(relays, filter);
-  const latest = events.sort((a: NostrEvent, b: NostrEvent) => b.created_at - a.created_at)[0];
+  const latest = events.sort((a, b) => b.created_at - a.created_at)[0];
   if (!latest || !latest.content) {
     return {};
   }
 
   try {
-    const metadata = JSON.parse(latest.content) as ProfileMetadata;
+    const metadata = JSON.parse(latest.content);
     cache.set(cacheKey, metadata);
     return metadata;
   } catch {
@@ -57,8 +50,8 @@ export async function fetchProfileMetadata(pool: SimplePool, relays: string[], p
   }
 }
 
-function collectDeletedIds(events: NostrEvent[]): Set<string> {
-  const deleted = new Set<string>();
+function collectDeletedIds(events) {
+  const deleted = new Set();
   for (const event of events) {
     if (event.kind !== 5) continue;
     for (const tag of event.tags) {
@@ -70,9 +63,9 @@ function collectDeletedIds(events: NostrEvent[]): Set<string> {
   return deleted;
 }
 
-export async function fetchArticles(pool: SimplePool, config: Config, pubkey: string): Promise<NostrEvent[]> {
+export async function fetchArticles(pool, config, pubkey) {
   const cacheKey = `articles-${pubkey}-${JSON.stringify(config.fetch)}`;
-  const cached = cache.get<NostrEvent[]>(cacheKey);
+  const cached = cache.get(cacheKey);
   if (cached) {
     console.log(`Using cached articles for ${pubkey}`);
     return cached;
@@ -80,9 +73,9 @@ export async function fetchArticles(pool: SimplePool, config: Config, pubkey: st
 
   console.log(`Fetching articles for ${pubkey}...`);
   const relays = config.relays;
-  const filters: Filter[] = [];
+  const filters = [];
 
-  const baseFilter: Filter = {
+  const baseFilter = {
     authors: [pubkey],
     kinds: [30023],
     since: config.fetch.since,
@@ -94,7 +87,7 @@ export async function fetchArticles(pool: SimplePool, config: Config, pubkey: st
     filters.push({ authors: [pubkey], kinds: [1], since: config.fetch.since, until: config.fetch.until });
   }
 
-  const deletionFilter: Filter = {
+  const deletionFilter = {
     authors: [pubkey],
     kinds: [5],
     since: config.fetch.since,
@@ -107,7 +100,7 @@ export async function fetchArticles(pool: SimplePool, config: Config, pubkey: st
   ]);
 
   const deletedIds = collectDeletedIds(deletions);
-  const deduped = new Map<string, NostrEvent>();
+  const deduped = new Map();
   for (const event of events) {
     if (!event.content || !event.content.trim()) continue;
     if (deletedIds.has(event.id)) continue;
@@ -121,21 +114,17 @@ export async function fetchArticles(pool: SimplePool, config: Config, pubkey: st
   return result;
 }
 
-export async function fetchComments(
-  pool: SimplePool,
-  relays: string[],
-  articleEventIds: string[]
-): Promise<Map<string, Comment[]>> {
+export async function fetchComments(pool, relays, articleEventIds) {
   if (articleEventIds.length === 0) return new Map();
 
   // Fetch kind 1 events that reply to any of our articles
-  const filter: Filter = {
+  const filter = {
     kinds: [1],
     "#e": articleEventIds
   };
 
   const events = await pool.querySync(relays, filter);
-  const commentsByArticle = new Map<string, NostrEvent[]>();
+  const commentsByArticle = new Map();
 
   // Group comments by article event ID
   for (const event of events) {
@@ -145,16 +134,16 @@ export async function fetchComments(
       if (!commentsByArticle.has(articleId)) {
         commentsByArticle.set(articleId, []);
       }
-      commentsByArticle.get(articleId)!.push(event);
+      commentsByArticle.get(articleId).push(event);
     }
   }
 
   // Fetch author profiles for all comment authors
   const authorPubkeys = [...new Set(events.map(e => e.pubkey))];
-  const profiles = new Map<string, ProfileMetadata>();
+  const profiles = new Map();
   
   if (authorPubkeys.length > 0) {
-    const profileFilter: Filter = {
+    const profileFilter = {
       kinds: [0],
       authors: authorPubkeys
     };
@@ -162,7 +151,7 @@ export async function fetchComments(
     
     for (const event of profileEvents) {
       try {
-        const metadata = JSON.parse(event.content) as ProfileMetadata;
+        const metadata = JSON.parse(event.content);
         profiles.set(event.pubkey, metadata);
       } catch {
         // Ignore invalid profiles
@@ -171,9 +160,9 @@ export async function fetchComments(
   }
 
   // Convert to Comment objects
-  const result = new Map<string, Comment[]>();
+  const result = new Map();
   for (const [articleId, events] of commentsByArticle.entries()) {
-    const comments: Comment[] = events
+    const comments = events
       .sort((a, b) => a.created_at - b.created_at) // Oldest first
       .map(event => {
         const profile = profiles.get(event.pubkey);

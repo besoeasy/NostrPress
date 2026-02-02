@@ -1,20 +1,19 @@
 import slugifyLib from "slugify";
-import { Event as NostrEvent, nip19 } from "nostr-tools";
-import { Article } from "../types.js";
+import { nip19 } from "nostr-tools";
 
-const slugify = slugifyLib as unknown as (text: string, options?: any) => string;
+const slugify = slugifyLib;
 
-function getTagValue(tags: string[][], name: string): string | undefined {
+function getTagValue(tags, name) {
   const tag = tags.find((t) => t[0] === name && t[1]);
   return tag?.[1];
 }
 
-function getAllTagValues(tags: string[][], name: string): string[] {
+function getAllTagValues(tags, name) {
   return tags.filter((t) => t[0] === name && t[1]).map((t) => t[1]);
 }
 
-function parseImetaUrls(tags: string[][]): string[] {
-  const urls: string[] = [];
+function parseImetaUrls(tags) {
+  const urls = [];
   for (const tag of tags) {
     if (tag[0] !== "imeta") continue;
     for (const entry of tag.slice(1)) {
@@ -28,13 +27,13 @@ function parseImetaUrls(tags: string[][]): string[] {
   return urls;
 }
 
-function extractTitle(content: string): string | undefined {
+function extractTitle(content) {
   const match = content.match(/^#\s+(.+)$/m);
   return match?.[1]?.trim();
 }
 
-export function parseArticle(event: NostrEvent): Article {
-  const tags = event.tags as string[][];
+export function parseArticle(event) {
+  const tags = event.tags;
   const title = getTagValue(tags, "title") || extractTitle(event.content) || "Untitled";
   const slugFromTag = getTagValue(tags, "d");
   const slug = slugFromTag || slugify(title, { lower: true, strict: true });
@@ -45,7 +44,7 @@ export function parseArticle(event: NostrEvent): Article {
   const tagsList = getAllTagValues(tags, "t");
   const imeta_urls = parseImetaUrls(tags);
 
-  let naddr: string | undefined;
+  let naddr;
   if (slugFromTag && event.kind === 30023) {
     try {
       naddr = nip19.naddrEncode({
