@@ -26,8 +26,11 @@ export function loadConfig(cliBaseUrl) {
   }
   
   // Normalize base URL: remove trailing slash to avoid double slashes in URLs
-  if (baseUrl !== "." && baseUrl.endsWith("/")) {
+  if (baseUrl.endsWith("/")) {
     baseUrl = baseUrl.slice(0, -1);
+  }
+  if (baseUrl === "." || baseUrl === "./") {
+    baseUrl = "";
   }
   
   const maxSizeMb = process.env.MAX_SIZE_MB ? Number(process.env.MAX_SIZE_MB) : defaultConfig.media.max_size_mb;

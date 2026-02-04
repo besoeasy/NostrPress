@@ -4,12 +4,19 @@ import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import nunjucks from "nunjucks";
+import slugifyLib from "slugify";
 
 const md = new MarkdownIt({
   html: false,
   linkify: true,
   typographer: true
 });
+
+const slugify = slugifyLib;
+const normalizeTag = (tag) => {
+  const slug = slugify(tag, { lower: true, strict: true });
+  return slug || encodeURIComponent(String(tag).toLowerCase());
+};
 
 const sanitizer = (html) =>
   sanitizeHtml(html, {
@@ -103,9 +110,16 @@ export function renderSite(context, outputDir) {
 
   const tagMap = new Map();
   for (const article of articlesSorted) {
+    article.tagSlugs = article.tags.map(normalizeTag);
+    article.tagSlugMap = Object.fromEntries(
+      article.tags.map((tag, index) => [tag, article.tagSlugs[index]])
+    );
     for (const tag of article.tags) {
-      if (!tagMap.has(tag)) tagMap.set(tag, []);
-      tagMap.get(tag).push(article);
+      const tagSlug = normalizeTag(tag);
+      if (!tagMap.has(tagSlug)) {
+        tagMap.set(tagSlug, { name: tag, slug: tagSlug, articles: [] });
+      }
+      tagMap.get(tagSlug).articles.push(article);
     }
   }
 
@@ -115,8 +129,8 @@ export function renderSite(context, outputDir) {
     writeFile(path.join(outputDir, `${article.slug}.html`), articleHtml);
   }
 
-  for (const [tag, articles] of tagMap.entries()) {
-    const tagHtml = env.render("tag.njk", { ...context, tag, articles });
-    writeFile(path.join(outputDir, "tags", tag, "index.html"), tagHtml);
+  for (const { name, slug, articles } of tagMap.values()) {
+    const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles });
+    writeFile(path.join(outputDir, "tags", slug, "index.html"), tagHtml);
   }
 }

@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { SimplePool } from "nostr-tools";
+import slugifyLib from "slugify";
 import { loadConfig } from "./config/loadConfig.js";
 import { resolveIdentity, fetchProfileMetadata, fetchArticles, fetchComments } from "./nostr/client.js";
 import { parseArticle } from "./parser/articleParser.js";
@@ -56,6 +57,12 @@ function sortArticles(articles) {
     return a.id.localeCompare(b.id);
   });
 }
+
+const slugify = slugifyLib;
+const normalizeTag = (tag) => {
+  const slug = slugify(tag, { lower: true, strict: true });
+  return slug || encodeURIComponent(String(tag).toLowerCase());
+};
 
 function buildContext(config, npub, pubkey, profile, articles) {
   const siteTitle = config.site.title === "auto" ? profile.display_name || profile.name || npub : config.site.title;
@@ -131,7 +138,7 @@ function generateSitemap(context, outputDir) {
 
   const tagSet = new Set();
   for (const article of context.articles) {
-    for (const tag of article.tags) tagSet.add(tag);
+    for (const tag of article.tags) tagSet.add(normalizeTag(tag));
   }
   for (const tag of tagSet) {
     urls.push(`${context.site.base_url}/tags/${tag}/`);
