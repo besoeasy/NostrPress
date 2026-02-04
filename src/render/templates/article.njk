@@ -52,9 +52,8 @@
     
     {% if article.image %}
     <div class="-mx-6 lg:-mx-12 xl:-mx-16 mb-12">
-      <div class="relative h-96 lg:h-[32rem] xl:h-[36rem] overflow-hidden rounded-3xl">
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent z-10"></div>
-        <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover" itemprop="image" />
+      <div class="relative overflow-hidden rounded-3xl bg-slate-100">
+        <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-auto object-contain" itemprop="image" />
       </div>
     </div>
     {% endif %}
