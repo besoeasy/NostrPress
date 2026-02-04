@@ -127,94 +127,109 @@
     <a href="#main-content" class="skip-to-content">Skip to content</a>
     <div class="flex min-h-screen">
       <!-- Sidebar: responsive, sticky -->
-      <aside class="hidden lg:flex lg:w-80 xl:w-96 border-r border-slate-100 bg-white sticky top-0 h-screen overflow-y-auto scrollbar-hide flex-col" role="complementary" aria-label="Author information">
-        <div class="p-8 space-y-8 w-full flex-1 flex flex-col justify-center">
+      <aside class="hidden lg:flex lg:w-80 xl:w-96 border-r border-slate-200/60 bg-gradient-to-b from-slate-50/50 to-white sticky top-0 h-screen overflow-y-auto scrollbar-hide flex-col shadow-sm" role="complementary" aria-label="Author information">
+        <div class="p-10 space-y-10 w-full flex-1 flex flex-col justify-center">
           {% if author %}
             <!-- Profile Header -->
-            <div class="text-center space-y-4">
+            <div class="text-center space-y-6">
               {% if author.profile.picture %}
                 <div class="relative inline-block group">
-                  <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity duration-500"></div>
-                  <img class="relative h-32 w-32 rounded-2xl object-cover ring-4 ring-white shadow-lg mx-auto transform transition-transform duration-500 group-hover:scale-105" src="{{ author.profile.picture }}" alt="Profile picture" />
+                  <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-all duration-700 animate-pulse"></div>
+                  <div class="relative">
+                    <img class="relative h-36 w-36 rounded-3xl object-cover ring-4 ring-white shadow-2xl mx-auto transform transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl" src="{{ author.profile.picture }}" alt="Profile picture" />
+                    <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full ring-4 ring-white shadow-lg"></div>
+                  </div>
                 </div>
               {% endif %}
               
-              <div class="space-y-2">
+              <div class="space-y-3">
                 <a href="{{ site.base_url }}/" class="block group">
-                  <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h1 class="text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
                     {{ author.profile.display_name or author.profile.name or site.title }}
                   </h1>
                 </a>
                 {% if author.profile.about %}
-                  <p class="text-sm text-slate-500 leading-relaxed">{{ author.profile.about }}</p>
+                  <p class="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">{{ author.profile.about }}</p>
                 {% endif %}
               </div>
             </div>
 
-            <!-- Social Links (Minimal) -->
-            <div class="flex flex-wrap justify-center gap-2">
+            <!-- Social Links (Enhanced) -->
+            <div class="flex flex-wrap justify-center gap-3">
               {% if author.profile.website %}
-              <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200" aria-label="Website">
+              <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Website">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Website</span>
               </a>
               {% endif %}
 
               {% if author.npub %}
-              <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-all duration-200" aria-label="Nostr Profile">
+              <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-purple-600 bg-white hover:bg-purple-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Nostr Profile">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Nostr</span>
               </a>
               {% endif %}
 
               {% if author.profile.twitter %}
-              <a href="https://twitter.com/{{ author.profile.twitter }}" target="_blank" rel="noopener noreferrer" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-all duration-200" aria-label="Twitter">
+              <a href="https://twitter.com/{{ author.profile.twitter }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-500 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Twitter">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Twitter</span>
               </a>
               {% endif %}
 
               {% if author.profile.github %}
-              <a href="https://github.com/{{ author.profile.github }}" target="_blank" rel="noopener noreferrer" class="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-all duration-200" aria-label="GitHub">
+              <a href="https://github.com/{{ author.profile.github }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="GitHub">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">GitHub</span>
               </a>
               {% endif %}
 
               {% if author.profile.telegram %}
-              <a href="https://t.me/{{ author.profile.telegram }}" target="_blank" rel="noopener noreferrer" class="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-50 rounded-full transition-all duration-200" aria-label="Telegram">
+              <a href="https://t.me/{{ author.profile.telegram }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-400 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Telegram">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Telegram</span>
               </a>
               {% endif %}
 
               {% if author.profile.lud16 %}
-              <a href="lightning:{{ author.profile.lud16 }}" class="p-2 text-slate-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-full transition-all duration-200" aria-label="Lightning">
+              <a href="lightning:{{ author.profile.lud16 }}" class="group relative p-3 text-slate-400 hover:text-yellow-500 bg-white hover:bg-yellow-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Lightning">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"></path></svg>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Lightning</span>
               </a>
               {% endif %}
             </div>
 
           {% else %}
             <!-- Site Info Fallback (No Author) -->
-            <div class="text-center space-y-4">
+            <div class="text-center space-y-6">
+              <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mx-auto shadow-lg"></div>
               <a href="{{ site.base_url }}/" class="block group">
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
                   {{ site.title }}
                 </h1>
               </a>
-              <p class="text-sm text-slate-500 leading-relaxed">{{ site.description }}</p>
+              <p class="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">{{ site.description }}</p>
             </div>
           {% endif %}
         </div>
         
         <!-- Footer / NPUB -->
         {% if author and author.npub %}
-        <div class="p-8 border-t border-slate-50">
-          <div class="text-center group cursor-pointer" onclick="navigator.clipboard.writeText('{{ author.npub }}'); alert('NPUB copied!')">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 group-hover:text-blue-500 transition-colors">Nostr Public Key</p>
+        <div class="p-8 border-t border-slate-100 bg-slate-50/50">
+          <div class="text-center group cursor-pointer" onclick="navigator.clipboard.writeText('{{ author.npub }}'); const el = event.currentTarget.querySelector('.copy-feedback'); el.classList.remove('opacity-0'); setTimeout(() => el.classList.add('opacity-0'), 2000);">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 group-hover:text-blue-600 transition-colors">Nostr Public Key</p>
             <div class="relative">
-                <code class="block text-[10px] text-slate-400 bg-slate-50 px-2 py-1.5 rounded-md break-all group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors duration-200">
+                <code class="block text-[11px] text-slate-500 bg-white px-3 py-2 rounded-lg break-all group-hover:bg-blue-50 group-hover:text-blue-700 transition-all duration-300 shadow-sm border border-slate-200 group-hover:border-blue-300 font-mono">
                 {{ author.npub | truncate(24) }}...
                 </code>
-                <!-- Tooltip hint -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-blue-50/90 text-blue-600 text-xs font-medium rounded-md pointer-events-none">
+                <!-- Enhanced Tooltip -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600/95 text-white text-xs font-semibold rounded-lg pointer-events-none">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     Click to Copy
+                </div>
+                <!-- Copy Feedback -->
+                <div class="copy-feedback absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg opacity-0 transition-opacity shadow-lg whitespace-nowrap pointer-events-none">
+                    ✓ Copied!
                 </div>
             </div>
           </div>
