@@ -17,7 +17,6 @@ NPUB=your_npub BASE_URL=https://yourdomain.com npx github:besoeasy/NostrPress
 
 Generates a static site in `./dist` folder. Deploy to any hosting platform or browse locally.
 
-
 ## Configuration
 
 | Variable      | Required | Description                            |
