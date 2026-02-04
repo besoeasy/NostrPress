@@ -78,52 +78,113 @@
       <div class="h-1 w-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full"></div>
     </header>
 
-    <div class="space-y-8">
-      {% for article in articles %}
-        <article class="group relative">
-          <a href="{{ site.base_url }}/{{ article.slug }}.html" class="block">
-            <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1">
+    <!-- Featured Article (First Post) -->
+    {% if articles.length > 0 %}
+    {% set featured = articles[0] %}
+    <article class="group relative">
+      <a href="{{ site.base_url }}/{{ featured.slug }}.html" class="block">
+        <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1">
+          <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+          
+          {% if featured.image %}
+          <div class="relative h-64 lg:h-96 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10"></div>
+            <img src="{{ featured.image }}" alt="{{ featured.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+          </div>
+          {% endif %}
+          
+          <div class="relative p-8 lg:p-10 space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider rounded-full">Featured</span>
+              <time class="text-sm font-medium text-slate-500 tracking-wide">{{ featured.published_at | date("Y-m-d") }}</time>
+              {% if featured.readingTime %}
+                <span class="text-slate-300">•</span>
+                <span class="text-sm text-slate-500">{{ featured.readingTime }} min read</span>
+              {% endif %}
+            </div>
+            
+            <h2 class="text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
+              {{ featured.title }}
+            </h2>
+            
+            {% if featured.summary %}
+              <p class="text-base lg:text-lg text-slate-600 leading-relaxed line-clamp-3">{{ featured.summary }}</p>
+            {% endif %}
+            
+            {% if featured.tags.length %}
+              <div class="flex flex-wrap gap-2 pt-2">
+                {% for tag in featured.tags | slice(0, 3) %}
+                  <span class="text-xs font-medium text-blue-600 hover:text-blue-700">#{{ tag }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+            
+            <div class="flex items-center gap-2 text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
+              <span class="text-sm font-medium">Read article</span>
+              <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+    </article>
+    {% endif %}
+
+    <!-- Recent Posts Grid -->
+    {% if articles.length > 1 %}
+    <section class="space-y-8">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">Recent Posts</h2>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {% for article in articles %}
+        {% if not loop.first %}
+        <article class="group relative flex flex-col">
+          <a href="{{ site.base_url }}/{{ article.slug }}.html" class="flex flex-col h-full">
+            <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 flex flex-col h-full">
               <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
               
               {% if article.image %}
-              <div class="relative h-64 lg:h-80 overflow-hidden">
+              <div class="relative h-48 overflow-hidden flex-shrink-0">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10"></div>
                 <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
               </div>
               {% endif %}
               
-              <div class="relative p-8 lg:p-10 space-y-4">
-                <div class="flex items-center gap-3">
-                  <time class="text-sm font-medium text-slate-500 tracking-wide">{{ article.published_at | date("Y-m-d") }}</time>
-                  {% if article.tags.length %}
+              <div class="relative p-6 space-y-3 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs">
+                  <time class="font-medium text-slate-500">{{ article.published_at | date("Y-m-d") }}</time>
+                  {% if article.readingTime %}
                     <span class="text-slate-300">•</span>
-                    <div class="flex flex-wrap gap-2">
-                      {% for tag in article.tags | slice(0, 2) %}
-                        <span class="text-xs font-medium text-blue-600">#{{ tag }}</span>
-                      {% endfor %}
-                    </div>
+                    <span class="text-slate-500">{{ article.readingTime }} min</span>
                   {% endif %}
                 </div>
                 
-                <h2 class="text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
+                <h3 class="text-xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
                   {{ article.title }}
-                </h2>
+                </h3>
                 
                 {% if article.summary %}
-                  <p class="text-base lg:text-lg text-slate-600 leading-relaxed line-clamp-2">{{ article.summary }}</p>
+                  <p class="text-sm text-slate-600 leading-relaxed line-clamp-3 flex-1">{{ article.summary }}</p>
                 {% endif %}
                 
-                <div class="flex items-center gap-2 text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
-                  <span class="text-sm font-medium">Read article</span>
-                  <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </div>
+                {% if article.tags.length %}
+                  <div class="flex flex-wrap gap-2 pt-2">
+                    {% for tag in article.tags | slice(0, 2) %}
+                      <span class="text-xs font-medium text-blue-600">#{{ tag }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </div>
           </a>
         </article>
-      {% endfor %}
-    </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
   </div>
 {% endblock %}
