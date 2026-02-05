@@ -17,19 +17,6 @@ NPUB=your_npub BASE_URL=https://yourdomain.com npx github:besoeasy/NostrPress
 
 Generates a static site in `./dist` folder. Deploy to any hosting platform or browse locally.
 
-## Recommended Deployment
-
-**Fork this repository and deploy via GitHub Actions** for the best experience:
-
-1. Fork this repo to your GitHub account
-2. Set environment variables in your fork's repository settings (Settings → Secrets and variables → Actions)
-   - Add `NPUB` as a repository variable
-   - Add `BASE_URL` as a repository variable
-   - Add any other configuration variables as needed
-3. Set up GitHub Actions to build and deploy your site
-
-This approach ensures you can always run the latest version with bug fixes and new features while maintaining your own configuration.
-
 ## Configuration
 
 | Variable      | Required | Description                            |
