@@ -99,6 +99,23 @@ function writeStaticAssets(outputDir, rootDir) {
   if (fs.existsSync(srcPrintCss)) {
     fs.copyFileSync(srcPrintCss, destPrintCss);
   }
+
+  // Copy favicon files
+  const faviconFiles = [
+    "favicon.ico",
+    "favicon.svg",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "apple-touch-icon.png"
+  ];
+  
+  for (const file of faviconFiles) {
+    const srcFile = path.join(rootDir, "src/static", file);
+    const destFile = path.join(outputDir, file);
+    if (fs.existsSync(srcFile)) {
+      fs.copyFileSync(srcFile, destFile);
+    }
+  }
 }
 
 function runTailwind(outputDir, rootDir) {
