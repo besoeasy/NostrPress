@@ -29,12 +29,14 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build site
         env:
           NPUB: ${{ vars.NPUB || secrets.NPUB }}
           BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL }}
-        run: |
-          npx github:besoeasy/NostrPress
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
