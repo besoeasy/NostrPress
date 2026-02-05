@@ -13,8 +13,6 @@ Generate a modern static blog from your [Nostr](https://github.com/nostr-protoco
 [![Deploy to AWS Amplify](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/besoeasy/NostrPress)
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.StaticApp)
 
-**GitHub Pages**: Fork this repo and enable the included GitHub Actions workflow (`.github/workflows/deploy.yml`)
-
 **Option 2: Run with npx**
 
 ```bash
