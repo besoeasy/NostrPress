@@ -12,8 +12,6 @@ import { parseArticle } from "./parser/articleParser.js";
 import { processMedia, rewriteArticleContent } from "./media/mediaPipeline.js";
 import { renderMarkdown, renderSite } from "./render/render.js";
 
-
-
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function ensureDir(dir) {
@@ -54,8 +52,7 @@ const normalizeTag = (tag) => {
 
 function buildContext(config, npub, pubkey, profile, articles) {
   const siteTitle = config.site.title === "auto" ? profile.display_name || profile.name || npub : config.site.title;
-  const siteDescription =
-    config.site.description === "auto" ? profile.about || `Posts by ${siteTitle}` : config.site.description;
+  const siteDescription = config.site.description === "auto" ? profile.about || `Posts by ${siteTitle}` : config.site.description;
 
   return {
     site: {
@@ -65,9 +62,9 @@ function buildContext(config, npub, pubkey, profile, articles) {
     author: {
       npub,
       pubkey,
-      profile
+      profile,
     },
-    articles
+    articles,
   };
 }
 
@@ -88,14 +85,8 @@ function writeStaticAssets(outputDir, rootDir) {
   }
 
   // Copy favicon files
-  const faviconFiles = [
-    "favicon.ico",
-    "favicon.svg",
-    "favicon-16x16.png",
-    "favicon-32x32.png",
-    "apple-touch-icon.png"
-  ];
-  
+  const faviconFiles = ["favicon.ico", "favicon.svg", "favicon-16x16.png", "favicon-32x32.png", "apple-touch-icon.png"];
+
   for (const file of faviconFiles) {
     const srcFile = path.join(rootDir, "src/static", file);
     const destFile = path.join(outputDir, file);
@@ -114,7 +105,7 @@ function runTailwind(outputDir, rootDir) {
 
   execFileSync(process.execPath, [tailwindCli, "-c", config, "-i", input, "-o", output], {
     stdio: "inherit",
-    cwd: rootDir
+    cwd: rootDir,
   });
 }
 
@@ -145,18 +136,18 @@ async function run() {
 
   const withSummary = sorted.map((article) => ({
     ...article,
-    summary: normalizeSummary(article.content, article.summary)
+    summary: normalizeSummary(article.content, article.summary),
   }));
 
   // Fetch comments for all articles
-  const articleEventIds = withSummary.map(a => a.id);
+  const articleEventIds = withSummary.map((a) => a.id);
   const commentsMap = await fetchComments(pool, identity.relays, articleEventIds);
   await pool.close(identity.relays);
 
   // Attach comments to articles
   const withComments = withSummary.map((article) => ({
     ...article,
-    comments: commentsMap.get(article.id) || []
+    comments: commentsMap.get(article.id) || [],
   }));
 
   cleanOutput(config.output_dir);
@@ -166,7 +157,7 @@ async function run() {
 
   const rendered = rewritten.map((article) => ({
     ...article,
-    html: renderMarkdown(article)
+    html: renderMarkdown(article),
   }));
 
   const context = buildContext(config, identity.npub, identity.pubkey, profile, rendered);
