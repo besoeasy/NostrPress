@@ -14,7 +14,7 @@
  * @property {Object} site
  * @property {string} site.title
  * @property {string} site.description
- * @property {string} site.base_url
+ *
  * @property {Object} media
  * @property {boolean} media.download
  * @property {number} media.max_size_mb
@@ -78,7 +78,7 @@
  * @property {Object} site
  * @property {string} site.title
  * @property {string} site.description
- * @property {string} site.base_url
+ *
  * @property {Object} author
  * @property {string} author.npub
  * @property {string} author.pubkey

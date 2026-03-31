@@ -16,7 +16,7 @@ Generate a modern static blog from your [Nostr](https://github.com/nostr-protoco
 **Option 2: Run with npx**
 
 ```bash
-NPUB=your_npub BASE_URL=https://yourdomain.com npx github:besoeasy/NostrPress
+NPUB=your_npub npx github:besoeasy/NostrPress
 ```
 
 Generates a static site in `./dist` folder. Deploy to any hosting platform or browse locally.
@@ -26,11 +26,10 @@ Generates a static site in `./dist` folder. Deploy to any hosting platform or br
 | Variable      | Required | Description                            |
 | ------------- | -------- | -------------------------------------- |
 | `NPUB`        | ✅       | Your Nostr public key                  |
-| `BASE_URL`    | ❌       | Base URL (auto-detected on most hosts) |
 | `RELAYS`      | ❌       | Comma-separated relay URLs             |
 | `OUTPUT_DIR`  | ❌       | Output directory (default: `./dist`)   |
 | `MAX_SIZE_MB` | ❌       | Max media file size (default: 20)      |
 
 ## Features
 
-Static blog with tags, RSS, sitemap, reading time, Nostr comments, media caching, and responsive design.
+Static blog with tags, reading time, Nostr comments, media caching, and responsive design.

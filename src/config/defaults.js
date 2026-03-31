@@ -7,8 +7,7 @@ export const defaultConfig = {
   output_dir: "./dist",
   site: {
     title: "auto",
-    description: "auto",
-    base_url: ""
+    description: "auto"
   },
   media: {
     download: true,

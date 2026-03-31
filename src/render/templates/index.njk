@@ -2,7 +2,7 @@
 
 {% set pageTitle = site.title %}
 {% set pageDescription = site.description %}
-{% set canonicalUrl = site.base_url if site.base_url else "" %}
+{% set canonicalUrl = "/" %}
 {% set ogType = "website" %}
 {% set ogImage = articles[0].image if articles.length > 0 and articles[0].image else "" %}
 
@@ -14,7 +14,7 @@
   "@type": "Blog",
   "name": "{{ site.title }}",
   "description": "{{ site.description }}",
-  {% if site.base_url %}"url": "{{ site.base_url }}",{% endif %}
+  
   {% if author %}"author": {
     "@type": "Person",
     "name": "{{ author.profile.display_name or author.profile.name }}",
@@ -33,7 +33,7 @@
       "@type": "BlogPosting",
       "headline": {{ article.title | dump | safe }},
       {% if article.summary %}"description": {{ article.summary | dump | safe }},{% endif %}
-      {% if site.base_url %}"url": "{{ site.base_url }}/{{ article.slug }}.html",{% endif %}
+      "url": "/{{ article.slug }}.html",
       "datePublished": "{{ article.published_at | date('iso') }}",
       {% if article.modified_at %}"dateModified": "{{ (article.modified_at * 1000) | date('iso') }}",{% endif %}
       {% if article.image %}"image": "{{ article.image }}",{% endif %}
@@ -64,8 +64,8 @@
   "itemListElement": [{
     "@type": "ListItem",
     "position": 1,
-    "name": "Home"
-    {% if site.base_url %},"item": "{{ site.base_url }}"{% endif %}
+    "name": "Home",
+    "item": "/"
   }]
 }
 </script>
@@ -82,7 +82,7 @@
     {% if articles.length > 0 %}
     {% set featured = articles[0] %}
     <article class="group relative">
-      <a href="{{ site.base_url }}/{{ featured.slug }}.html" class="block">
+      <a href="/{{ featured.slug }}.html" class="block">
         <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1">
           <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
           
@@ -142,7 +142,7 @@
         {% for article in articles %}
         {% if not loop.first %}
         <article class="group relative flex flex-col">
-          <a href="{{ site.base_url }}/{{ article.slug }}.html" class="flex flex-col h-full">
+          <a href="/{{ article.slug }}.html" class="flex flex-col h-full">
             <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 flex flex-col h-full">
               <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
               
