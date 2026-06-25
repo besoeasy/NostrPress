@@ -31,6 +31,78 @@ Generates a static site in `./blog` folder. Deploy to any hosting platform or br
 
 Static blog with tags, reading time, Nostr comments, media caching, and responsive design.
 
+## Vite Integration
+
+If you are building a Vite + Vue 3 app and want to serve the generated blog at `/blog/`, copy the output into Vite's `public/` directory so it is served as-is at build time.
+
+**1. Generate the blog output**
+
+```bash
+NPUB=your_npub npx github:besoeasy/NostrPress
+# Output is written to ./blog/
+```
+
+**2. Copy `blog/` into your Vite project's `public/` folder**
+
+```bash
+cp -r ./blog ./your-vite-project/public/blog
+```
+
+Your project structure will look like:
+
+```
+your-vite-project/
+├── public/
+│   └── blog/          ← static blog files served at /blog/
+│       ├── index.html
+│       └── ...
+├── src/
+│   └── ...
+├── vite.config.js
+└── package.json
+```
+
+**3. `vite.config.js`** — no special config needed; Vite serves everything inside `public/` automatically.
+
+```js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [vue(), tailwindcss()],
+})
+```
+
+**4. Access your blog**
+
+| Mode | URL |
+|------|-----|
+| Dev server | `http://localhost:5173/blog/` |
+| Production build | `https://yourdomain.com/blog/` |
+
+> **Tip:** Run `npm run dev` and open `http://localhost:5173/blog/` to preview the blog alongside your Vue app.
+
+**5. Automate in `package.json`** (optional)
+
+Add a script that generates and copies the blog before building:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "blog:fetch": "NPUB=your_npub npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
+    "build:all": "npm run blog:fetch && npm run build"
+  }
+}
+```
+
+Run `npm run build:all` to fetch the latest Nostr posts and produce a complete production build.
+
+---
+
 ## GitHub Actions
 
 Create `.github/workflows/blog.yml`:
