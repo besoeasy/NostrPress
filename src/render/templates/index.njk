@@ -57,30 +57,30 @@
     border-bottom: 1px solid var(--border);
   }
   .index-avatar {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
-    border: 2px solid var(--border);
+    border: 1.5px solid var(--border);
   }
   .index-avatar-placeholder {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: var(--surface-alt);
-    border: 2px solid var(--border);
+    border: 1.5px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.375rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--ink-muted);
     flex-shrink: 0;
   }
   .index-author-meta { flex: 1; min-width: 0; }
   .index-author-name {
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     font-weight: 650;
     color: var(--ink);
     letter-spacing: -0.02em;
@@ -89,10 +89,10 @@
     display: inline-block;
     transition: opacity 0.15s;
   }
-  .index-author-name:hover { opacity: 0.7; }
+  .index-author-name:hover { opacity: 0.65; }
   .index-author-bio {
     margin-top: 0.3rem;
-    font-size: 0.9375rem;
+    font-size: 0.9rem;
     color: var(--ink-muted);
     line-height: 1.6;
     max-width: 52ch;
@@ -109,9 +109,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
     color: var(--ink-muted);
     text-decoration: none;
     transition: background 0.15s, color 0.15s;
@@ -120,17 +120,9 @@
     background: var(--surface-alt);
     color: var(--ink);
   }
-  .profile-link svg { width: 16px; height: 16px; }
+  .profile-link svg { width: 15px; height: 15px; }
 
-  /* Section heading */
-  .section-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-subtle);
-    margin-bottom: 1.5rem;
-  }
+
 
   /* ── Article list ─────────────────────────────── */
   .post-list {
@@ -145,35 +137,31 @@
   }
 
   .post-link {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 1rem;
-    padding: 1.25rem 0;
+    display: block;
+    padding: 1.125rem 0;
     text-decoration: none;
     color: inherit;
-    transition: opacity 0.15s;
+    transition: transform 0.18s ease, opacity 0.18s ease;
   }
-  .post-link:hover { opacity: 0.7; }
-
-  .post-link-with-image {
-    grid-template-columns: 1fr 80px;
+  .post-link:hover {
+    transform: translateX(3px);
+    opacity: 0.8;
   }
 
   .post-title {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--ink);
     letter-spacing: -0.015em;
-    line-height: 1.4;
-    margin-bottom: 0.25rem;
+    line-height: 1.45;
+    margin-bottom: 0.2rem;
   }
 
   .post-summary {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--ink-muted);
     line-height: 1.55;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -183,33 +171,26 @@
   .post-meta {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    font-size: 0.8125rem;
+    gap: 0.5rem;
+    font-size: 0.8rem;
     color: var(--ink-subtle);
   }
-  .post-meta-sep { opacity: 0.4; }
+  .post-meta-sep { opacity: 0.35; }
 
   .post-tags {
     display: flex;
-    gap: 0.4rem;
+    gap: 0.375rem;
     flex-wrap: wrap;
-    margin-top: 0.4rem;
+    margin-top: 0.375rem;
   }
   .post-tag {
-    font-size: 0.75rem;
+    font-size: 0.725rem;
     color: var(--ink-subtle);
     font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
-  .post-thumb {
-    width: 80px;
-    height: 60px;
-    border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-    align-self: center;
-  }
+
 </style>
 {% endblock %}
 
@@ -251,11 +232,7 @@
             <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
           </a>
           {% endif %}
-          {% if author.profile.lud16 %}
-          <a href="lightning:{{ author.profile.lud16 }}" class="profile-link" aria-label="Lightning tip">
-            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
-          </a>
-          {% endif %}
+
           {% if author.profile.telegram %}
           <a href="https://t.me/{{ author.profile.telegram }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="Telegram">
             <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
@@ -268,33 +245,27 @@
 
     {# Post list #}
     {% if articles.length > 0 %}
-      <p class="section-label">Writing</p>
       <ul class="post-list" role="list">
         {% for article in articles %}
         <li class="post-item">
-          <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
-            <div>
-              <h2 class="post-title">{{ article.title }}</h2>
-              {% if article.summary %}
-                <p class="post-summary">{{ article.summary }}</p>
-              {% endif %}
-              <div class="post-meta">
-                <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
-                {% if article.readingTime %}
-                  <span class="post-meta-sep">·</span>
-                  <span>{{ article.readingTime }} min</span>
-                {% endif %}
-              </div>
-              {% if article.tags.length %}
-                <div class="post-tags">
-                  {% for tag in article.tags | slice(0, 4) %}
-                    <span class="post-tag">#{{ tag }}</span>
-                  {% endfor %}
-                </div>
+          <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
+            <h2 class="post-title">{{ article.title }}</h2>
+            {% if article.summary %}
+              <p class="post-summary">{{ article.summary }}</p>
+            {% endif %}
+            <div class="post-meta">
+              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+              {% if article.readingTime %}
+                <span class="post-meta-sep">·</span>
+                <span>{{ article.readingTime }} min</span>
               {% endif %}
             </div>
-            {% if article.image %}
-              <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
+            {% if article.tags.length %}
+              <div class="post-tags">
+                {% for tag in article.tags | slice(0, 4) %}
+                  <span class="post-tag">#{{ tag }}</span>
+                {% endfor %}
+              </div>
             {% endif %}
           </a>
         </li>

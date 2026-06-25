@@ -68,10 +68,10 @@
 
     {% block additionalHead %}{% endblock %}
 
-    <!-- Inter font -->
+    <!-- Inter variable font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="{{ pathPrefix }}css/site.css" />
     <link rel="stylesheet" href="{{ pathPrefix }}css/print.css" media="print" />
@@ -81,10 +81,10 @@
         --ink-muted: #6b7280;
         --ink-subtle: #9ca3af;
         --surface: #ffffff;
-        --surface-alt: #f9fafb;
+        --surface-alt: #f5f5f5;
         --border: #e5e7eb;
         --accent: #0a0a0a;
-        --accent-warm: #f59e0b;
+        --accent-warm: #d97706;
         font-size: 16px;
       }
 
@@ -92,8 +92,23 @@
 
       html { scroll-behavior: smooth; }
 
+      /* Minimal custom scrollbar */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--ink-subtle); }
+      * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+      /* Focus ring */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 3px;
+      }
+
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        font-optical-sizing: auto;
         background: var(--surface);
         color: var(--ink);
         -webkit-font-smoothing: antialiased;
@@ -121,7 +136,7 @@
       /* ── Main layout ─────────────────────────────────── */
       .site-main {
         min-height: calc(100vh - 56px);
-        max-width: 760px;
+        max-width: 680px;
         margin: 0 auto;
         padding: 3.5rem 1.5rem;
       }
@@ -131,9 +146,9 @@
         border-top: 1px solid var(--border);
       }
       .footer-inner {
-        max-width: 760px;
+        max-width: 680px;
         margin: 0 auto;
-        padding: 1rem 1.5rem;
+        padding: 1.25rem 1.5rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -143,11 +158,23 @@
       .footer-text {
         font-size: 0.8125rem;
         color: var(--ink-subtle);
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+      }
+      .footer-text::before {
+        content: '';
+        display: inline-block;
+        width: 12px;
+        height: 1px;
+        background: var(--border);
+        flex-shrink: 0;
       }
       .footer-text a {
         color: var(--ink-muted);
         text-decoration: none;
         font-weight: 500;
+        transition: color 0.15s;
       }
       .footer-text a:hover { color: var(--ink); }
 
@@ -172,11 +199,11 @@
 
       /* ── Page enter animation ─────────────────────────── */
       @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(6px); }
         to   { opacity: 1; transform: translateY(0); }
       }
       .page-enter {
-        animation: fadeUp 0.4s ease both;
+        animation: fadeUp 0.35s ease-out both;
       }
 
       /* ── Author profile block (used on index) ─────────── */
@@ -238,6 +265,12 @@
         transition: color 0.15s;
       }
       .author-social a:hover { color: var(--ink); }
+
+      /* ── Selection highlight ──────────────────────────── */
+      ::selection {
+        background: #0a0a0a;
+        color: #fff;
+      }
     </style>
   </head>
   <body>
