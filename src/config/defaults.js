@@ -4,7 +4,7 @@ export const defaultConfig = {
   },
   relays: ["wss://relay.damus.io", "wss://nos.lol"],
   trusted_only: true,
-  output_dir: "./dist",
+  output_dir: "./blog",
   site: {
     title: "auto",
     description: "auto"

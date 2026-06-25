@@ -19,7 +19,7 @@ Generate a modern static blog from your [Nostr](https://github.com/nostr-protoco
 NPUB=your_npub npx github:besoeasy/NostrPress
 ```
 
-Generates a static site in `./dist` folder. Deploy to any hosting platform or browse locally.
+Generates a static site in `./blog` folder. Deploy to any hosting platform or browse locally.
 
 ## Configuration
 
