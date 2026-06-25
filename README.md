@@ -1,142 +1,144 @@
 # NostrPress
 
-Generate a modern static blog from your [Nostr](https://github.com/nostr-protocol/nostr) long-form posts (kind 30023). Publish once on Nostr, get a SEO-optimized website automatically.
+Turn your [Nostr](https://nostr.com) long-form posts into a static blog. One command, no config.
 
-## Quick Start
+---
 
-**Option 1: One-click deploy**
+## How it works
 
-[![Deploy with Vercel](https://vercel.com/button)](<https://vercel.com/new/clone?repository-url=https://github.com/besoeasy/NostrPress&env=NPUB&envDescription=Your%20Nostr%20public%20key%20(npub1...)&project-name=nostrpress-blog>)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/besoeasy/NostrPress)
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/besoeasy/NostrPress)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/besoeasy/NostrPress)
-[![Deploy to AWS Amplify](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/besoeasy/NostrPress)
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.StaticApp)
+1. You pass your `npub` key
+2. NostrPress fetches your articles from Nostr relays
+3. It downloads media and generates a complete static site into `./blog`
+4. Drop that folder anywhere — any host, any framework
 
-**Option 2: Run with npx**
+---
 
+## Run it
+
+**npx**
 ```bash
-NPUB=your_npub npx github:besoeasy/NostrPress
+NPUB=npub1... npx github:besoeasy/NostrPress
 ```
 
-Generates a static site in `./blog` folder. Deploy to any hosting platform or browse locally.
-
-## Configuration
-
-| Variable | Required | Description           |
-| -------- | -------- | --------------------- |
-| `NPUB`   | ✅       | Your Nostr public key |
-
-## Features
-
-Static blog with tags, reading time, Nostr comments, media caching, and responsive design.
-
-## Vite Integration
-
-If you are building a Vite + Vue 3 app and want to serve the generated blog at `/blog/`, copy the output into Vite's `public/` directory so it is served as-is at build time.
-
-**1. Generate the blog output**
-
+**bun**
 ```bash
-NPUB=your_npub npx github:besoeasy/NostrPress
-# Output is written to ./blog/
+NPUB=npub1... bunx github:besoeasy/NostrPress
 ```
 
-**2. Copy `blog/` into your Vite project's `public/` folder**
+Output lands in `./blog/` — ready to serve.
 
-```bash
-cp -r ./blog ./your-vite-project/public/blog
-```
+---
 
-Your project structure will look like:
+## Use with any framework
 
-```
-your-vite-project/
-├── public/
-│   └── blog/          ← static blog files served at /blog/
-│       ├── index.html
-│       └── ...
-├── src/
-│   └── ...
-├── vite.config.js
-└── package.json
-```
+The generated `./blog` folder is pure static HTML/CSS/JS. Copy it into your framework's public/static directory and it's served as-is.
 
-**3. `vite.config.js`** — no special config needed; Vite serves everything inside `public/` automatically.
-
-```js
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
-
-export default defineConfig({
-  plugins: [vue(), tailwindcss()],
-})
-```
-
-**4. Access your blog**
-
-| Mode | URL |
-|------|-----|
-| Dev server | `http://localhost:5173/blog/` |
-| Production build | `https://yourdomain.com/blog/` |
-
-> **Tip:** Run `npm run dev` and open `http://localhost:5173/blog/` to preview the blog alongside your Vue app.
-
-**5. Automate in `package.json`** (optional)
-
-Add a script that generates and copies the blog before building:
+### Vue (Vite)
 
 ```json
+// package.json
 {
   "scripts": {
+    "blog:fetch": "NPUB=npub1... npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "blog:fetch": "NPUB=your_npub npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
-    "build:all": "npm run blog:fetch && npm run build"
+    "build": "npm run blog:fetch && vite build",
+    "preview": "vite preview"
   }
 }
 ```
 
-Run `npm run build:all` to fetch the latest Nostr posts and produce a complete production build.
+Blog lives at `/blog/` alongside your Vue app. No vite config changes needed — Vite serves everything in `public/` automatically.
 
 ---
 
-## GitHub Actions
+### React (Vite or CRA)
 
-Create `.github/workflows/blog.yml`:
+**Vite + React** — same as Vue above, just swap the plugin:
 
-Change your_npub to nostr NPUB
-
-```yaml
-name: Build & Publish Blog
-
-on:
-  schedule:
-    - cron: "0 0 */3 * *"   # every 3 days at midnight UTC
-  workflow_dispatch:         # allow manual trigger
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Generate blog
-        run: NPUB=your_npub npx github:besoeasy/NostrPress
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./blog
+```json
+{
+  "scripts": {
+    "blog:fetch": "NPUB=npub1... npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
+    "dev": "vite",
+    "build": "npm run blog:fetch && vite build"
+  }
+}
 ```
 
+**Create React App**
+
+```json
+{
+  "scripts": {
+    "blog:fetch": "NPUB=npub1... npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
+    "start": "react-scripts start",
+    "build": "npm run blog:fetch && react-scripts build"
+  }
+}
+```
+
+---
+
+### Nuxt
+
+```json
+{
+  "scripts": {
+    "blog:fetch": "NPUB=npub1... npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
+    "dev": "nuxt dev",
+    "build": "npm run blog:fetch && nuxt build",
+    "generate": "npm run blog:fetch && nuxt generate"
+  }
+}
+```
+
+---
+
+### Next.js
+
+```json
+{
+  "scripts": {
+    "blog:fetch": "NPUB=npub1... npx github:besoeasy/NostrPress && cp -r ./blog ./public/blog",
+    "dev": "next dev",
+    "build": "npm run blog:fetch && next build"
+  }
+}
+```
+
+---
+
+### Plain HTML / no framework
+
+```bash
+NPUB=npub1... npx github:besoeasy/NostrPress
+# serve ./blog with any static host
+npx serve ./blog
+```
+
+---
+
+## What you get
+
+```
+blog/
+├── index.html          ← homepage with all posts
+├── your-post-slug.html ← individual article pages
+├── tags/
+│   └── tag-name/
+│       └── index.html  ← posts filtered by tag
+├── assets/
+│   └── images/         ← downloaded media, cached locally
+├── css/
+│   └── site.css
+└── js/
+    └── site.js
+```
+
+---
+
+## Environment variable
+
+| Variable | Description |
+|----------|-------------|
+| `NPUB`   | Your Nostr public key (`npub1...`) |
