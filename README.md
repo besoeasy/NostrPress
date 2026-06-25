@@ -23,12 +23,9 @@ Generates a static site in `./dist` folder. Deploy to any hosting platform or br
 
 ## Configuration
 
-| Variable      | Required | Description                            |
-| ------------- | -------- | -------------------------------------- |
-| `NPUB`        | ✅       | Your Nostr public key                  |
-| `RELAYS`      | ❌       | Comma-separated relay URLs             |
-| `OUTPUT_DIR`  | ❌       | Output directory (default: `./dist`)   |
-| `MAX_SIZE_MB` | ❌       | Max media file size (default: 20)      |
+| Variable | Required | Description           |
+| -------- | -------- | --------------------- |
+| `NPUB`   | ✅       | Your Nostr public key |
 
 ## Features
 
