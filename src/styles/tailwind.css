@@ -3,13 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Hide scrollbar but keep functionality */
+  /* Hide scrollbar but keep scroll functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -19,96 +13,17 @@
   }
 }
 
-@layer components {
-  /* Prose styling for article content */
-  .prose {
-    @apply text-slate-700;
-  }
-  
-  .prose h1, .prose h2, .prose h3, .prose h4 {
-    @apply font-bold tracking-tight text-slate-900;
-  }
-  
-  .prose h1 {
-    @apply text-4xl lg:text-5xl mt-12 mb-6;
-  }
-  
-  .prose h2 {
-    @apply text-3xl lg:text-4xl mt-10 mb-5;
-  }
-  
-  .prose h3 {
-    @apply text-2xl lg:text-3xl mt-8 mb-4;
-  }
-  
-  .prose p {
-    @apply text-base lg:text-lg leading-relaxed my-6;
-  }
-  
-  .prose a {
-    @apply text-blue-600 hover:text-blue-700 underline decoration-blue-300 underline-offset-4 hover:decoration-blue-500 transition-all duration-200;
-  }
-  
-  .prose strong {
-    @apply font-semibold text-slate-900;
-  }
-  
-  .prose em {
-    @apply italic text-slate-800;
-  }
-  
-  .prose code {
-    @apply text-blue-700 bg-blue-50 px-2 py-1 rounded text-sm font-mono border border-blue-100;
-  }
-  
-  .prose pre {
-    @apply bg-slate-900 border border-slate-200 rounded-2xl p-6 overflow-x-auto my-8 shadow-xl;
-  }
-  
-  .prose pre code {
-    @apply bg-transparent px-0 py-0 text-slate-100 border-0;
-  }
-  
-  .prose blockquote {
-    @apply border-l-4 border-blue-500 pl-6 py-2 my-8 italic text-slate-600 bg-blue-50 rounded-r-xl;
-  }
-  
-  .prose ul, .prose ol {
-    @apply my-6 space-y-2;
-  }
-  
-  .prose li {
-    @apply text-base lg:text-lg leading-relaxed;
-  }
-  
-  .prose img {
-    @apply rounded-2xl shadow-xl my-8 border border-slate-200;
-  }
-  
-  .prose hr {
-    @apply border-slate-200 my-12;
-  }
-  
-  /* Line clamp utilities */
+@layer utilities {
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
-  .line-clamp-4 {
+  .line-clamp-3 {
     display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  .line-clamp-6 {
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 }
-

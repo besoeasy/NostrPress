@@ -6,15 +6,13 @@
 {% set ogType = "article" %}
 {% set ogImage = article.image or "" %}
 
-{% block content %}
+{% block additionalHead %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "headline": {{ article.title | dump | safe }},
-  "image": [
-    {% if article.image %}"{{ article.image }}"{% endif %}
-  ],
+  "image": [{% if article.image %}"{{ article.image }}"{% endif %}],
   "datePublished": "{{ article.published_at | date('iso') }}",
   {% if article.modified_at %}"dateModified": "{{ article.modified_at | date('iso') }}",{% else %}"dateModified": "{{ article.published_at | date('iso') }}",{% endif %}
   "author": {
@@ -25,200 +23,484 @@
   "publisher": {
     "@type": "Organization",
     "name": "{{ site.title }}",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "{{ author.profile.picture }}"
-    }
+    "logo": { "@type": "ImageObject", "url": "{{ author.profile.picture }}" }
   },
   {% if article.summary %}"description": {{ article.summary | dump | safe }},{% endif %}
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "{{ canonicalUrl }}"
-  }
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "{{ canonicalUrl }}" }
 }
 </script>
+<style>
+  /* ── Article page ─────────────────────────────── */
 
-  <article class="space-y-12" itemscope itemtype="https://schema.org/BlogPosting">
-    <meta itemprop="headline" content="{{ article.title }}" />
-    <meta itemprop="description" content="{{ pageDescription }}" />
-    <meta itemprop="datePublished" content="{{ article.published_at | date('iso') }}" />
-    {% if article.modified_at %}
-    <meta itemprop="dateModified" content="{{ article.modified_at * 1000 | date('iso') }}" />
-    {% endif %}
-    <meta itemprop="author" content="{{ author.profile.display_name or author.profile.name }}" />
-    {% if article.image %}
-    <meta itemprop="image" content="{{ article.image }}" />
-    {% endif %}
-    
-    {% if article.image %}
-    <div class="-mx-6 lg:-mx-12 xl:-mx-16 mb-12">
-      <div class="relative overflow-hidden rounded-3xl bg-slate-100">
-        <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-auto object-contain" itemprop="image" />
-      </div>
-    </div>
-    {% endif %}
-    
-    <header class="space-y-6 pb-12 border-b border-slate-200">
-      <div class="space-y-4">
-        <div class="flex items-center gap-4 text-sm font-medium text-slate-500">
-          <time datetime="{{ article.published_at | date('iso') }}" itemprop="datePublished" class="tracking-wide">
-            {{ article.published_at | date("Y-m-d") }}
-          </time>
-          {% if article.readingTime %}
-          <span class="flex items-center gap-1" aria-label="Estimated reading time">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{ article.readingTime }} min read
-          </span>
-          {% endif %}
-          {% if article.wordCount %}
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-            </svg>
-            {{ article.wordCount }} words
-          </span>
-          {% endif %}
-        </div>
-        <h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-slate-900 leading-tight" itemprop="headline">{{ article.title }}</h1>
-      </div>
-      
-      {% if article.tags.length %}
-        <div class="flex flex-wrap gap-2" aria-label="Article tags">
-          {% for tag in article.tags %}
-              <a href="/tags/{{ article.tagSlugMap[tag] or tag }}/" class="group relative inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300" itemprop="keywords">
-                #{{ tag }}
-              </a>
-          {% endfor %}
-        </div>
+  .article-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin-bottom: 2.5rem;
+    transition: color 0.15s;
+  }
+  .article-back:hover { color: var(--ink); }
+  .article-back svg { width: 15px; height: 15px; }
+
+  /* Hero image */
+  .article-hero {
+    margin: 0 0 2.5rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+  }
+  .article-hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Header */
+  .article-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--ink-subtle);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .article-meta-sep { opacity: 0.4; }
+
+  .article-title {
+    font-size: clamp(1.625rem, 4vw, 2.375rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.22;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+  }
+
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 1.25rem;
+  }
+  .article-tag {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.2rem 0.65rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .article-tag:hover {
+    border-color: var(--ink-muted);
+    color: var(--ink);
+  }
+
+  /* Share / open-on row */
+  .article-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+  .action-label {
+    font-size: 0.8125rem;
+    color: var(--ink-subtle);
+    font-weight: 500;
+    margin-right: 0.25rem;
+  }
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .action-btn:hover {
+    background: var(--surface-alt);
+    color: var(--ink);
+  }
+  .action-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .actions-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 0.125rem;
+  }
+
+  /* ── Prose ─────────────────────────────────────── */
+  .prose {
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  .prose > * + * { margin-top: 1.5em; }
+
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-top: 2.25em;
+    margin-bottom: 0.6em;
+  }
+  .prose h1 { font-size: 1.875rem; }
+  .prose h2 { font-size: 1.5rem; }
+  .prose h3 { font-size: 1.25rem; }
+  .prose h4 { font-size: 1.0625rem; }
+
+  .prose p { color: #1a1a1a; }
+
+  .prose a {
+    color: var(--ink);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .prose a:hover { opacity: 0.65; }
+
+  .prose strong { font-weight: 650; }
+  .prose em { color: #333; }
+
+  .prose ul, .prose ol { padding-left: 1.5rem; }
+  .prose ul { list-style: disc; }
+  .prose ol { list-style: decimal; }
+  .prose li + li { margin-top: 0.4em; }
+
+  .prose blockquote {
+    border-left: 3px solid var(--ink);
+    padding-left: 1.25rem;
+    color: var(--ink-muted);
+    font-style: italic;
+    margin-left: 0;
+  }
+
+  .prose code {
+    font-family: ui-monospace, 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.875em;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    color: var(--ink);
+  }
+
+  .prose pre {
+    background: #0f0f0f;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    border: 1px solid #1f1f1f;
+  }
+  .prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    color: #e5e7eb;
+  }
+
+  .prose img {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    max-width: 100%;
+  }
+
+  .prose hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3em 0;
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+  .prose th, .prose td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .prose th {
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  /* ── Related articles ─────────────────────────── */
+  .related-section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .related-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 1.25rem;
+  }
+  .related-list {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .related-item a {
+    display: block;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .related-item a:hover { opacity: 0.7; }
+  .related-thumb {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: block;
+    margin-bottom: 0.5rem;
+    background: var(--surface-alt);
+  }
+  .related-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    margin-bottom: 0.25rem;
+  }
+  .related-date {
+    font-size: 0.8125rem;
+    color: var(--ink-subtle);
+  }
+
+  /* ── Comments ─────────────────────────────────── */
+  .comments-section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .comments-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 1.5rem;
+  }
+  .comment-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .comment {
+    display: flex;
+    gap: 0.875rem;
+    align-items: flex-start;
+  }
+  .comment-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .comment-avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+  .comment-body { flex: 1; min-width: 0; }
+  .comment-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+  .comment-author {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .comment-date {
+    font-size: 0.8rem;
+    color: var(--ink-subtle);
+  }
+  .comment-text {
+    font-size: 0.9375rem;
+    color: #1a1a1a;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<article itemscope itemtype="https://schema.org/BlogPosting">
+  <meta itemprop="headline" content="{{ article.title }}" />
+  <meta itemprop="description" content="{{ pageDescription }}" />
+  <meta itemprop="datePublished" content="{{ article.published_at | date('iso') }}" />
+  {% if article.modified_at %}
+  <meta itemprop="dateModified" content="{{ article.modified_at * 1000 | date('iso') }}" />
+  {% endif %}
+  <meta itemprop="author" content="{{ author.profile.display_name or author.profile.name }}" />
+  {% if article.image %}
+  <meta itemprop="image" content="{{ article.image }}" />
+  {% endif %}
+
+  <a href="/" class="article-back" aria-label="Back to all posts">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    All posts
+  </a>
+
+  {% if article.image %}
+  <div class="article-hero">
+    <img src="{{ article.image }}" alt="{{ article.title }}" itemprop="image" />
+  </div>
+  {% endif %}
+
+  <header class="article-header">
+    <div class="article-meta">
+      <time datetime="{{ article.published_at | date('iso') }}" itemprop="datePublished">{{ article.published_at | date("Y-m-d") }}</time>
+      {% if article.readingTime %}
+        <span class="article-meta-sep">·</span>
+        <span>{{ article.readingTime }} min read</span>
       {% endif %}
+      {% if article.wordCount %}
+        <span class="article-meta-sep">·</span>
+        <span>{{ article.wordCount }} words</span>
+      {% endif %}
+    </div>
 
-      <!-- Social Share Buttons -->
-      <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
-        <span class="text-sm font-medium text-slate-600">Share:</span>
-        <a href="https://twitter.com/intent/tweet?text={{ pageTitle | urlencode }}&url={{ canonicalUrl | urlencode }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200" aria-label="Share on Twitter">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-          </svg>
-          Twitter
-        </a>
-        <a href="https://t.me/share/url?url={{ canonicalUrl | urlencode }}&text={{ pageTitle | urlencode }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200" aria-label="Share on Telegram">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"></path>
-          </svg>
-          Telegram
-        </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ canonicalUrl | urlencode }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200" aria-label="Share on Facebook">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
-          </svg>
-          Facebook
-        </a>
-        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ canonicalUrl | urlencode }}&title={{ pageTitle | urlencode }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200" aria-label="Share on LinkedIn">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
-          </svg>
-          LinkedIn
-        </a>
-        <button onclick="navigator.clipboard.writeText(window.location.href); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy Link', 2000)" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors duration-200" aria-label="Copy link">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-          </svg>
-          Copy Link
-        </button>
+    <h1 class="article-title" itemprop="headline">{{ article.title }}</h1>
+
+    {% if article.tags.length %}
+      <div class="article-tags" aria-label="Tags">
+        {% for tag in article.tags %}
+          <a href="/tags/{{ article.tagSlugMap[tag] or tag }}/" class="article-tag" itemprop="keywords">#{{ tag }}</a>
+        {% endfor %}
       </div>
+    {% endif %}
 
-      <!-- Open elsewhere -->
+    <!-- Share -->
+    <div class="article-actions" aria-label="Share this article">
+      <span class="action-label">Share</span>
+      <a href="https://twitter.com/intent/tweet?text={{ pageTitle | urlencode }}&url={{ canonicalUrl | urlencode }}" target="_blank" rel="noopener noreferrer" class="action-btn" aria-label="Share on Twitter">
+        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Twitter
+      </a>
+      <a href="https://t.me/share/url?url={{ canonicalUrl | urlencode }}&text={{ pageTitle | urlencode }}" target="_blank" rel="noopener noreferrer" class="action-btn" aria-label="Share on Telegram">
+        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram
+      </a>
+      <button onclick="navigator.clipboard.writeText(window.location.href); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy link', 2000)" class="action-btn" aria-label="Copy link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        Copy link
+      </button>
+
       {% if article.naddr %}
-      <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
-        <span class="text-sm font-medium text-slate-600">Open on:</span>
-        
-        <a href="https://habla.news/a/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
-          Habla
-        </a>
-
-        <a href="https://yakihonne.com/article/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
-          Yakihonne
-        </a>
-
-        <a href="https://primal.net/e/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all duration-200">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm4.5 17.5h-9v-11h9v11z"/></svg> 
-          Primal
-        </a>
-      </div>
+      <span class="actions-divider" aria-hidden="true"></span>
+      <span class="action-label">Open on</span>
+      <a href="https://habla.news/a/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="action-btn">Habla</a>
+      <a href="https://yakihonne.com/article/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="action-btn">Yakihonne</a>
+      <a href="https://primal.net/e/{{ article.naddr }}" target="_blank" rel="noopener noreferrer" class="action-btn">Primal</a>
       {% endif %}
-    </header>
-
-    <div class="prose prose-lg xl:prose-xl max-w-none" itemprop="articleBody">
-      {{ article.html | safe }}
     </div>
-  </article>
+  </header>
 
-  <!-- Related Articles -->
-  {% if relatedArticles.length %}
-    <section class="mt-20 pt-16 border-t border-slate-200 space-y-8" aria-labelledby="related-articles-heading">
-      <h2 id="related-articles-heading" class="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">Related Articles</h2>
-      
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for related in relatedArticles %}
-          <article class="group rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+  <div class="prose" itemprop="articleBody">
+    {{ article.html | safe }}
+  </div>
+</article>
+
+<!-- Related articles -->
+{% if relatedArticles.length %}
+  <section class="related-section" aria-labelledby="related-heading">
+    <p class="related-label" id="related-heading">Related</p>
+    <ul class="related-list" role="list">
+      {% for related in relatedArticles %}
+        <li class="related-item">
+          <a href="/{{ related.slug }}.html">
             {% if related.image %}
-              <a href="/{{ related.slug }}.html" class="block relative h-48 overflow-hidden">
-                <img src="{{ related.image }}" alt="{{ related.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-              </a>
+              <img src="{{ related.image }}" alt="" class="related-thumb" loading="lazy" aria-hidden="true" />
+            {% else %}
+              <div class="related-thumb" style="display:flex;align-items:center;justify-content:center;">
+                <svg width="24" height="24" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
             {% endif %}
-            <div class="p-6 space-y-3">
-              <a href="/{{ related.slug }}.html" class="block">
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2">{{ related.title }}</h3>
-              </a>
-              {% if related.excerpt %}
-                <p class="text-sm text-slate-600 line-clamp-3">{{ related.excerpt }}</p>
-              {% endif %}
-              <div class="flex items-center gap-3 text-xs text-slate-500 pt-2">
-                <time datetime="{{ related.published_at | date('iso') }}">{{ related.published_at | date("Y-m-d") }}</time>
-                {% if related.readingTime %}
-                  <span>{{ related.readingTime }} min read</span>
-                {% endif %}
-              </div>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    </section>
-  {% endif %}
+            <div class="related-title">{{ related.title }}</div>
+            <div class="related-date">{{ related.published_at | date("Y-m-d") }}</div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
 
-  {% if article.comments.length %}
-    <section class="mt-20 pt-16 border-t border-slate-200 space-y-8" aria-labelledby="comments-heading">
-      <div class="space-y-2">
-        <h2 id="comments-heading" class="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">Comments</h2>
-        <p class="text-slate-500">{{ article.comments.length }} {{ 'comment' if article.comments.length == 1 else 'comments' }}</p>
-      </div>
-      
-      <div class="space-y-6">
-        {% for comment in article.comments %}
-          <article class="group rounded-2xl border border-slate-200 bg-white p-6 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
-            <div class="flex items-start gap-4">
-              {% if comment.author_picture %}
-                <img src="{{ comment.author_picture }}" alt="{{ comment.author_name or 'Anonymous' }}" class="w-12 h-12 rounded-full ring-2 ring-slate-200 group-hover:ring-blue-300 transition-all duration-300" loading="lazy" />
-              {% else %}
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-600 text-sm font-medium ring-2 ring-slate-200 group-hover:ring-blue-300 transition-all duration-300" aria-label="Commenter avatar">
-                  {{ (comment.author_name or comment.pubkey)[0] | upper }}
-                </div>
-              {% endif %}
-              <div class="flex-1 min-w-0 space-y-2">
-                <div class="flex items-baseline gap-3">
-                  <span class="font-semibold text-slate-900">{{ comment.author_name or comment.pubkey.slice(0, 8) + '...' }}</span>
-                  <time datetime="{{ comment.created_at * 1000 | date('iso') }}" class="text-xs font-medium text-slate-500">{{ (comment.created_at * 1000) | date("Y-m-d") }}</time>
-                </div>
-                <p class="text-base text-slate-700 whitespace-pre-wrap break-words leading-relaxed">{{ comment.content }}</p>
-              </div>
+<!-- Comments -->
+{% if article.comments.length %}
+  <section class="comments-section" aria-labelledby="comments-heading">
+    <p class="comments-label" id="comments-heading">
+      {{ article.comments.length }} {{ 'comment' if article.comments.length == 1 else 'comments' }}
+    </p>
+    <ul class="comment-list" role="list">
+      {% for comment in article.comments %}
+        <li class="comment">
+          {% if comment.author_picture %}
+            <img src="{{ comment.author_picture }}" alt="{{ comment.author_name or 'Anonymous' }}" class="comment-avatar" loading="lazy" />
+          {% else %}
+            <div class="comment-avatar-placeholder" aria-hidden="true">
+              {{ (comment.author_name or comment.pubkey or "?")[0] | upper }}
             </div>
-          </article>
-        {% endfor %}
-      </div>
-    </section>
-  {% endif %}
+          {% endif %}
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-author">{{ comment.author_name or comment.pubkey.slice(0, 8) + '…' }}</span>
+              <time class="comment-date" datetime="{{ comment.created_at * 1000 | date('iso') }}">{{ (comment.created_at * 1000) | date("Y-m-d") }}</time>
+            </div>
+            <p class="comment-text">{{ comment.content }}</p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
 {% endblock %}

@@ -6,71 +6,168 @@
 {% set ogType = "profile" %}
 {% set ogImage = author.profile.picture or "" %}
 
-{% block content %}
-  <div class="space-y-12">
-    <header class="rounded-3xl border border-slate-200 bg-white p-10 lg:p-12">
-      <div class="flex flex-col lg:flex-row items-start gap-8">
-        {% if author.profile.picture %}
-          <div class="relative group">
-            <div class="absolute -inset-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full opacity-10 blur-lg group-hover:opacity-20 transition-opacity duration-500"></div>
-            <img class="relative h-32 w-32 lg:h-40 lg:w-40 rounded-full object-cover ring-4 ring-slate-200 transition-transform duration-300 group-hover:scale-105" src="{{ author.profile.picture }}" alt="Profile picture" />
-          </div>
-        {% endif %}
-        <div class="flex-1 space-y-4">
-          <div class="space-y-2">
-            <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
-            <p class="text-sm font-mono text-slate-500">{{ author.npub }}</p>
-          </div>
-          {% if author.profile.about %}
-            <p class="text-base lg:text-lg text-slate-700 leading-relaxed max-w-3xl">{{ author.profile.about }}</p>
-          {% endif %}
-        </div>
-      </div>
-    </header>
+{% block additionalHead %}
+<style>
+  /* reuse post-list styles */
+  .post-list { list-style: none; }
+  .post-item { border-bottom: 1px solid var(--border); }
+  .post-item:first-child { border-top: 1px solid var(--border); }
+  .post-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.15s;
+  }
+  .post-link:hover { opacity: 0.7; }
+  .post-link-with-image { grid-template-columns: 1fr 80px; }
+  .post-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+  }
+  .post-summary {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--ink-subtle);
+  }
+  .post-meta-sep { opacity: 0.4; }
+  .post-thumb {
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    align-self: center;
+  }
 
-    <div class="space-y-6">
-      <div class="flex items-center gap-3">
-        <h2 class="text-3xl font-bold tracking-tight text-slate-900">All Articles</h2>
-        <div class="h-1 w-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full"></div>
+  .author-page-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .author-page-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .author-page-avatar-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+  .author-page-meta { flex: 1; min-width: 0; }
+  .author-page-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 0.25rem;
+  }
+  .author-page-npub {
+    font-family: ui-monospace, 'SF Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink-subtle);
+    margin-bottom: 0.625rem;
+    word-break: break-all;
+  }
+  .author-page-bio {
+    font-size: 0.9375rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    max-width: 52ch;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <header class="author-page-header">
+    {% if author.profile.picture %}
+      <img src="{{ author.profile.picture }}" alt="{{ author.profile.display_name or author.profile.name }}" class="author-page-avatar" />
+    {% else %}
+      <div class="author-page-avatar-placeholder" aria-hidden="true">
+        {{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}
       </div>
-      
-      <div class="space-y-6">
-        {% for article in articles %}
-          <article class="group relative">
-            <a href="/{{ article.slug }}.html" class="block">
-              <div class="relative rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all duration-500 ease-out hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1">
-                <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 to-indigo-500/0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
-                
-                {% if article.image %}
-                <div class="relative h-56 lg:h-64 overflow-hidden">
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10"></div>
-                  <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                </div>
-                {% endif %}
-                
-                <div class="relative p-8 space-y-3">
-                  <time class="text-sm font-medium text-slate-500 tracking-wide">{{ article.published_at | date("Y-m-d") }}</time>
-                  
-                  <h3 class="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
-                    {{ article.title }}
-                  </h3>
-                  
-                  {% if article.summary %}
-                    <p class="text-base text-slate-600 leading-relaxed line-clamp-2">{{ article.summary }}</p>
-                  {% endif %}
-                  
-                  <div class="flex items-center gap-2 text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
-                    <span class="text-sm font-medium">Read article</span>
-                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </article>
-        {% endfor %}
-      </div>
+    {% endif %}
+    <div class="author-page-meta">
+      <h1 class="author-page-name">{{ author.profile.display_name or author.profile.name or author.npub }}</h1>
+      {% if author.npub %}
+        <p class="author-page-npub">{{ author.npub }}</p>
+      {% endif %}
+      {% if author.profile.about %}
+        <p class="author-page-bio">{{ author.profile.about }}</p>
+      {% endif %}
     </div>
-  </div>
+  </header>
+
+  {% if articles.length > 0 %}
+    <p class="section-label">All posts</p>
+    <ul class="post-list" role="list">
+      {% for article in articles %}
+      <li class="post-item">
+        <a href="/{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
+          <div>
+            <h2 class="post-title">{{ article.title }}</h2>
+            {% if article.summary %}
+              <p class="post-summary">{{ article.summary }}</p>
+            {% endif %}
+            <div class="post-meta">
+              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+              {% if article.readingTime %}
+                <span class="post-meta-sep">·</span>
+                <span>{{ article.readingTime }} min</span>
+              {% endif %}
+            </div>
+          </div>
+          {% if article.image %}
+            <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
+          {% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}

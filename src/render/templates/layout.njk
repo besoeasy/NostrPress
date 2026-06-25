@@ -8,18 +8,18 @@
     <meta name="author" content="{{ author.profile.display_name or author.profile.name or site.title }}" />
     <meta name="generator" content="NostrPress" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="theme-color" content="#3b82f6" />
+    <meta name="theme-color" content="#0a0a0a" />
     {% if canonicalUrl %}
     <link rel="canonical" href="{{ canonicalUrl }}" />
     {% endif %}
-    
+
     <!-- Favicon and Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-    <!-- Open Graph / Facebook / Telegram / WhatsApp -->
+    <!-- Open Graph -->
     <meta property="og:title" content="{{ pageTitle }}" />
     <meta property="og:description" content="{{ pageDescription }}" />
     <meta property="og:type" content="{{ ogType or 'website' }}" />
@@ -58,18 +58,9 @@
     <meta name="twitter:creator" content="@{{ author.profile.twitter }}" />
     {% endif %}
 
-    <!-- Pinterest -->
-    {% if ogImage %}
-    <meta property="og:see_also" content="{{ canonicalUrl }}" />
-    <meta name="pinterest-rich-pin" content="true" />
-    {% endif %}
-    
     <!-- Nostr Metadata -->
     {% if author.npub %}
     <meta name="nostr:npub" content="{{ author.npub }}" />
-    {% if author.nprofile %}
-    <meta name="nostr:nprofile" content="{{ author.nprofile }}" />
-    {% endif %}
     {% if author.profile.lud16 %}
     <meta name="lightning" content="{{ author.profile.lud16 }}" />
     {% endif %}
@@ -77,185 +68,310 @@
 
     {% block additionalHead %}{% endblock %}
 
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="/css/site.css" />
     <link rel="stylesheet" href="/css/print.css" media="print" />
-    <script>
-      // Auto-detect canonical URL and OG URL if not set at build time
-      if (!document.querySelector('link[rel="canonical"]')) {
-        const canonical = document.createElement('link');
-        canonical.rel = 'canonical';
-        canonical.href = window.location.href;
-        document.head.appendChild(canonical);
-        
-        const ogUrl = document.createElement('meta');
-        ogUrl.setAttribute('property', 'og:url');
-        ogUrl.content = window.location.href;
-        document.head.appendChild(ogUrl);
-      }
-    </script>
     <style>
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+      :root {
+        --ink: #0a0a0a;
+        --ink-muted: #6b7280;
+        --ink-subtle: #9ca3af;
+        --surface: #ffffff;
+        --surface-alt: #f9fafb;
+        --border: #e5e7eb;
+        --accent: #0a0a0a;
+        --accent-warm: #f59e0b;
+        font-size: 16px;
       }
-      .animate-fade-in {
-        animation: fadeIn 0.6s ease-out;
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        background: var(--surface);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        line-height: 1.6;
       }
-      html {
-        scroll-behavior: smooth;
-      }
-      .skip-to-content {
+
+      /* Skip link */
+      .skip-link {
         position: absolute;
-        top: -40px;
-        left: 0;
-        background: #3b82f6;
-        color: white;
-        padding: 8px 16px;
+        top: -60px;
+        left: 1rem;
+        z-index: 9999;
+        background: var(--ink);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 0 0 6px 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
         text-decoration: none;
-        border-radius: 0 0 4px 0;
-        z-index: 100;
+        transition: top 0.2s;
       }
-      .skip-to-content:focus {
+      .skip-link:focus { top: 0; }
+
+      /* ── Header / Nav ─────────────────────────────────── */
+      .site-header {
+        position: sticky;
         top: 0;
+        z-index: 100;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
       }
+
+      .header-inner {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .site-name {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        text-decoration: none;
+        color: var(--ink);
+      }
+
+      .site-name-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+
+      .site-name-text {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1;
+      }
+
+      .header-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .header-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: background 0.15s, color 0.15s;
+      }
+      .header-link:hover {
+        background: var(--surface-alt);
+        color: var(--ink);
+      }
+      .header-link svg { width: 17px; height: 17px; }
+
+      /* ── Main layout ─────────────────────────────────── */
+      .site-main {
+        min-height: calc(100vh - 56px - 56px);
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 3.5rem 1.5rem;
+      }
+
+      /* ── Footer ─────────────────────────────────────── */
+      .site-footer {
+        border-top: 1px solid var(--border);
+      }
+      .footer-inner {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .footer-text {
+        font-size: 0.8125rem;
+        color: var(--ink-subtle);
+      }
+      .footer-text a {
+        color: var(--ink-muted);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .footer-text a:hover { color: var(--ink); }
+
+      .footer-npub {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--ink-subtle);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: inherit;
+        transition: color 0.15s;
+      }
+      .footer-npub:hover { color: var(--ink-muted); }
+      .footer-npub code {
+        font-family: ui-monospace, 'SF Mono', monospace;
+        font-size: 0.75rem;
+      }
+
+      /* ── Page enter animation ─────────────────────────── */
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .page-enter {
+        animation: fadeUp 0.4s ease both;
+      }
+
+      /* ── Author profile block (used on index) ─────────── */
+      .author-block {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 3.5rem;
+        padding-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .author-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 2px solid var(--border);
+      }
+      .author-avatar-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--surface-alt);
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--ink-muted);
+      }
+      .author-info {}
+      .author-name {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+      }
+      .author-bio {
+        margin-top: 0.25rem;
+        font-size: 0.9rem;
+        color: var(--ink-muted);
+        line-height: 1.5;
+      }
+      .author-social {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .author-social a {
+        font-size: 0.8125rem;
+        color: var(--ink-subtle);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.15s;
+      }
+      .author-social a:hover { color: var(--ink); }
     </style>
   </head>
-  <body class="bg-white text-slate-900 antialiased">
-    <a href="#main-content" class="skip-to-content">Skip to content</a>
-    <div class="flex min-h-screen">
-      <!-- Sidebar: responsive, sticky -->
-      <aside class="hidden lg:flex lg:w-80 xl:w-96 border-r border-slate-200/60 bg-gradient-to-b from-slate-50/50 to-white sticky top-0 h-screen overflow-y-auto scrollbar-hide flex-col shadow-sm" role="complementary" aria-label="Author information">
-        <div class="p-10 space-y-10 w-full flex-1 flex flex-col justify-center">
-          {% if author %}
-            <!-- Profile Header -->
-            <div class="text-center space-y-6">
-              {% if author.profile.picture %}
-                <div class="relative inline-block group">
-                  <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-all duration-700 animate-pulse"></div>
-                  <div class="relative">
-                    <img class="relative h-36 w-36 rounded-3xl object-cover ring-4 ring-white shadow-2xl mx-auto transform transition-all duration-500 group-hover:scale-105 group-hover:shadow-3xl" src="{{ author.profile.picture }}" alt="Profile picture" />
-                    <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full ring-4 ring-white shadow-lg"></div>
-                  </div>
-                </div>
-              {% endif %}
-              
-              <div class="space-y-3">
-                <a href="/" class="block group">
-                  <h1 class="text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
-                    {{ author.profile.display_name or author.profile.name or site.title }}
-                  </h1>
-                </a>
-                {% if author.profile.about %}
-                  <p class="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">{{ author.profile.about }}</p>
-                {% endif %}
-              </div>
-            </div>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
 
-            <!-- Social Links (Enhanced) -->
-            <div class="flex flex-wrap justify-center gap-3">
-              {% if author.profile.website %}
-              <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Website">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Website</span>
-              </a>
-              {% endif %}
-
-              {% if author.npub %}
-              <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-purple-600 bg-white hover:bg-purple-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Nostr Profile">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Nostr</span>
-              </a>
-              {% endif %}
-
-              {% if author.profile.twitter %}
-              <a href="https://twitter.com/{{ author.profile.twitter }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-500 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Twitter">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Twitter</span>
-              </a>
-              {% endif %}
-
-              {% if author.profile.github %}
-              <a href="https://github.com/{{ author.profile.github }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="GitHub">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">GitHub</span>
-              </a>
-              {% endif %}
-
-              {% if author.profile.telegram %}
-              <a href="https://t.me/{{ author.profile.telegram }}" target="_blank" rel="noopener noreferrer" class="group relative p-3 text-slate-400 hover:text-blue-400 bg-white hover:bg-blue-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Telegram">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Telegram</span>
-              </a>
-              {% endif %}
-
-              {% if author.profile.lud16 %}
-              <a href="lightning:{{ author.profile.lud16 }}" class="group relative p-3 text-slate-400 hover:text-yellow-500 bg-white hover:bg-yellow-50 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5" aria-label="Lightning">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"></path></svg>
-                <span class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Lightning</span>
-              </a>
-              {% endif %}
-            </div>
-
-          {% else %}
-            <!-- Site Info Fallback (No Author) -->
-            <div class="text-center space-y-6">
-              <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mx-auto shadow-lg"></div>
-              <a href="/" class="block group">
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-300">
-                  {{ site.title }}
-                </h1>
-              </a>
-              <p class="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">{{ site.description }}</p>
-            </div>
+    <header class="site-header" role="banner">
+      <div class="header-inner">
+        <a href="/" class="site-name" aria-label="{{ site.title }} — home">
+          {% if author and author.profile.picture %}
+            <img src="{{ author.profile.picture }}" alt="" class="site-name-avatar" aria-hidden="true" />
           {% endif %}
-        </div>
-        
-        <!-- Footer / NPUB -->
+          <span class="site-name-text">{{ site.title }}</span>
+        </a>
+
+        <nav class="header-links" aria-label="Author links">
+          {% if author and author.profile.website %}
+          <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="header-link" aria-label="Website">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+          </a>
+          {% endif %}
+          {% if author and author.profile.twitter %}
+          <a href="https://twitter.com/{{ author.profile.twitter }}" target="_blank" rel="noopener noreferrer" class="header-link" aria-label="Twitter / X">
+            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          {% endif %}
+          {% if author and author.profile.github %}
+          <a href="https://github.com/{{ author.profile.github }}" target="_blank" rel="noopener noreferrer" class="header-link" aria-label="GitHub">
+            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02.004 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.19.69.8.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          {% endif %}
+          {% if author and author.npub %}
+          <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="header-link" aria-label="Nostr profile">
+            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
+          </a>
+          {% endif %}
+          {% if author and author.profile.lud16 %}
+          <a href="lightning:{{ author.profile.lud16 }}" class="header-link" aria-label="Lightning tip">
+            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+          </a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="site-main page-enter" role="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-inner">
+        <p class="footer-text">
+          Built with <a href="https://github.com/besoeasy/NostrPress" target="_blank" rel="noopener noreferrer">NostrPress</a>
+        </p>
         {% if author and author.npub %}
-        <div class="p-8 border-t border-slate-100 bg-slate-50/50">
-          <div class="text-center group cursor-pointer" onclick="navigator.clipboard.writeText('{{ author.npub }}'); const el = event.currentTarget.querySelector('.copy-feedback'); el.classList.remove('opacity-0'); setTimeout(() => el.classList.add('opacity-0'), 2000);">
-            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 group-hover:text-blue-600 transition-colors">Nostr Public Key</p>
-            <div class="relative">
-                <code class="block text-[11px] text-slate-500 bg-white px-3 py-2 rounded-lg break-all group-hover:bg-blue-50 group-hover:text-blue-700 transition-all duration-300 shadow-sm border border-slate-200 group-hover:border-blue-300 font-mono">
-                {{ author.npub | truncate(24) }}...
-                </code>
-                <!-- Enhanced Tooltip -->
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600/95 text-white text-xs font-semibold rounded-lg pointer-events-none">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    Click to Copy
-                </div>
-                <!-- Copy Feedback -->
-                <div class="copy-feedback absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg opacity-0 transition-opacity shadow-lg whitespace-nowrap pointer-events-none">
-                    ✓ Copied!
-                </div>
-            </div>
-          </div>
-        </div>
+        <button
+          class="footer-npub"
+          onclick="navigator.clipboard.writeText('{{ author.npub }}'); this.querySelector('span').textContent='Copied!'; setTimeout(()=>this.querySelector('span').textContent='{{ author.npub | truncate(20) }}…', 2000)"
+          aria-label="Copy Nostr public key"
+          title="{{ author.npub }}"
+        >
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
+          <code><span>{{ author.npub | truncate(20) }}…</span></code>
+        </button>
         {% endif %}
-      </aside>
-
-      <!-- Mobile Header -->
-      <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200">
-        <div class="px-6 py-4">
-          <a href="/" class="text-2xl font-bold tracking-tight text-slate-900" aria-label="Home">{{ site.title }}</a>
-        </div>
       </div>
-
-      <!-- Main content: responsive -->
-      <div class="flex-1 flex flex-col">
-        <main id="main-content" class="flex-1 w-full px-6 lg:px-12 xl:px-16 py-12 lg:py-16 xl:py-20 mt-16 lg:mt-0" role="main">
-          <div class="max-w-5xl mx-auto animate-fade-in">
-            {% block content %}{% endblock %}
-          </div>
-        </main>
-
-        <footer class="border-t border-slate-200 px-6 lg:px-12 xl:px-16 py-8 bg-slate-50" role="contentinfo">
-          <div class="max-w-5xl mx-auto">
-            <p class="text-sm text-slate-500">Generated from Nostr using <a href="https://github.com/besoeasy/NostrPress" target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-slate-900 transition-colors duration-200 font-medium">NostrPress</a></p>
-          </div>
-        </footer>
-      </div>
-    </div>
+    </footer>
 
     <script src="/js/site.js" defer></script>
   </body>
