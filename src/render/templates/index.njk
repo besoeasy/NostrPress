@@ -2,7 +2,7 @@
 
 {% set pageTitle = site.title %}
 {% set pageDescription = site.description %}
-{% set canonicalUrl = "/" %}
+{% set canonicalUrl = pathPrefix %}
 {% set ogType = "website" %}
 {% set ogImage = articles[0].image if articles.length > 0 and articles[0].image else "" %}
 
@@ -31,7 +31,7 @@
       "@type": "BlogPosting",
       "headline": {{ article.title | dump | safe }},
       {% if article.summary %}"description": {{ article.summary | dump | safe }},{% endif %}
-      "url": "/{{ article.slug }}.html",
+      "url": "{{ pathPrefix }}{{ article.slug }}.html",
       "datePublished": "{{ article.published_at | date('iso') }}",
       {% if article.modified_at %}"dateModified": "{{ (article.modified_at * 1000) | date('iso') }}",{% endif %}
       {% if article.image %}"image": "{{ article.image }}",{% endif %}
@@ -226,7 +226,7 @@
         </div>
       {% endif %}
       <div class="index-author-meta">
-        <a href="/" class="index-author-name">{{ author.profile.display_name or author.profile.name or site.title }}</a>
+        <a href="{{ pathPrefix }}" class="index-author-name">{{ author.profile.display_name or author.profile.name or site.title }}</a>
         {% if author.profile.about %}
           <p class="index-author-bio">{{ author.profile.about }}</p>
         {% endif %}
@@ -272,7 +272,7 @@
       <ul class="post-list" role="list">
         {% for article in articles %}
         <li class="post-item">
-          <a href="/{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
+          <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
             <div>
               <h2 class="post-title">{{ article.title }}</h2>
               {% if article.summary %}

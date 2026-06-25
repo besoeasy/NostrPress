@@ -2,7 +2,7 @@
 
 {% set pageTitle = article.title ~ " · " ~ site.title %}
 {% set pageDescription = article.excerpt or article.summary or site.description %}
-{% set canonicalUrl = "/" ~ article.slug ~ ".html" %}
+{% set canonicalUrl = pathPrefix ~ article.slug ~ ".html" %}
 {% set ogType = "article" %}
 {% set ogImage = article.image or "" %}
 
@@ -18,7 +18,7 @@
   "author": {
     "@type": "Person",
     "name": "{{ author.profile.display_name or author.profile.name }}",
-    "url": "/"
+    "url": "{{ pathPrefix }}"
   },
   "publisher": {
     "@type": "Organization",
@@ -386,7 +386,7 @@
   <meta itemprop="image" content="{{ article.image }}" />
   {% endif %}
 
-  <a href="/" class="article-back" aria-label="Back to all posts">
+  <a href="{{ pathPrefix }}" class="article-back" aria-label="Back to all posts">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
     All posts
   </a>
@@ -415,7 +415,7 @@
     {% if article.tags.length %}
       <div class="article-tags" aria-label="Tags">
         {% for tag in article.tags %}
-          <a href="/tags/{{ article.tagSlugMap[tag] or tag }}/" class="article-tag" itemprop="keywords">#{{ tag }}</a>
+          <a href="{{ pathPrefix }}tags/{{ article.tagSlugMap[tag] or tag }}/" class="article-tag" itemprop="keywords">#{{ tag }}</a>
         {% endfor %}
       </div>
     {% endif %}
@@ -458,7 +458,7 @@
     <ul class="related-list" role="list">
       {% for related in relatedArticles %}
         <li class="related-item">
-          <a href="/{{ related.slug }}.html">
+          <a href="{{ pathPrefix }}{{ related.slug }}.html">
             {% if related.image %}
               <img src="{{ related.image }}" alt="" class="related-thumb" loading="lazy" aria-hidden="true" />
             {% else %}

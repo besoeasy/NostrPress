@@ -105,7 +105,7 @@ export function renderSite(context, outputDir) {
     article.wordCount = article.content.trim().split(/\s+/).length;
   }
 
-  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted });
+  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted, pathPrefix: "./" });
   writeFile(path.join(outputDir, "index.html"), indexHtml);
 
   const tagMap = new Map();
@@ -125,12 +125,12 @@ export function renderSite(context, outputDir) {
 
   for (const article of articlesSorted) {
     const relatedArticles = findRelatedArticles(article, articlesSorted);
-    const articleHtml = env.render("article.njk", { ...context, article, relatedArticles });
+    const articleHtml = env.render("article.njk", { ...context, article, relatedArticles, pathPrefix: "./" });
     writeFile(path.join(outputDir, `${article.slug}.html`), articleHtml);
   }
 
   for (const { name, slug, articles } of tagMap.values()) {
-    const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles });
+    const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles, pathPrefix: "../../" });
     writeFile(path.join(outputDir, "tags", slug, "index.html"), tagHtml);
   }
 }

@@ -2,7 +2,7 @@
 
 {% set pageTitle = "#" ~ tag ~ " · " ~ site.title %}
 {% set pageDescription = "Articles tagged with #" ~ tag %}
-{% set canonicalUrl = "/tags/" ~ (tagSlug or tag) ~ "/" %}
+{% set canonicalUrl = pathPrefix ~ "tags/" ~ (tagSlug or tag) ~ "/" %}
 {% set ogType = "website" %}
 {% set ogImage = "" %}
 
@@ -103,7 +103,7 @@
 {% endblock %}
 
 {% block content %}
-  <a href="/" class="tag-back" aria-label="Back to all posts">
+  <a href="{{ pathPrefix }}" class="tag-back" aria-label="Back to all posts">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
     All posts
   </a>
@@ -117,7 +117,7 @@
   <ul class="post-list" role="list">
     {% for article in articles %}
     <li class="post-item">
-      <a href="/{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
+      <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
         <div>
           <h2 class="post-title">{{ article.title }}</h2>
           {% if article.summary %}

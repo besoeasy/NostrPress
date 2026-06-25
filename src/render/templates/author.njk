@@ -2,7 +2,7 @@
 
 {% set pageTitle = site.title ~ " · " ~ (author.profile.display_name or author.profile.name or author.npub) %}
 {% set pageDescription = author.profile.about or site.description %}
-{% set canonicalUrl = "/author/" %}
+{% set canonicalUrl = pathPrefix ~ "author/" %}
 {% set ogType = "profile" %}
 {% set ogImage = author.profile.picture or "" %}
 
@@ -148,7 +148,7 @@
     <ul class="post-list" role="list">
       {% for article in articles %}
       <li class="post-item">
-        <a href="/{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
+        <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
           <div>
             <h2 class="post-title">{{ article.title }}</h2>
             {% if article.summary %}
