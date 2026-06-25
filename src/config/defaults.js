@@ -19,6 +19,6 @@ export const defaultConfig = {
     include_kind1: false
   },
   timeouts: {
-    network_ms: 15000
+    network_ms: 30000
   }
 };

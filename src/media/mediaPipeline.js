@@ -60,38 +60,57 @@ function clearTimeoutSignal(signal) {
   if (timeoutId) clearTimeout(timeoutId);
 }
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url, options, timeoutMs, maxRetries = 3) {
+  let lastError;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const signal = getTimeoutSignal(timeoutMs);
+    try {
+      const res = await fetch(url, { ...options, signal });
+      clearTimeoutSignal(signal);
+      return res;
+    } catch (e) {
+      clearTimeoutSignal(signal);
+      lastError = e;
+      const isAbort = e && (e.name === "AbortError" || e.name === "TimeoutError" || String(e.message).includes("aborted"));
+      if (!isAbort || attempt === maxRetries - 1) throw e;
+      const backoff = 1000 * Math.pow(2, attempt);
+      console.warn(`Media fetch attempt ${attempt + 1} failed for ${url}, retrying in ${backoff}ms...`);
+      await sleep(backoff);
+    }
+  }
+  throw lastError;
+}
+
 async function headRequest(url, timeoutMs) {
-  const signal = getTimeoutSignal(timeoutMs);
   try {
-    const res = await fetch(url, { method: "HEAD", signal });
+    const res = await fetchWithRetry(url, { method: "HEAD" }, timeoutMs);
     if (!res.ok) {
       return {};
     }
     const mime = res.headers.get("content-type")?.split(";")[0]?.trim();
     const length = res.headers.get("content-length") ? Number(res.headers.get("content-length")) : undefined;
     return { mime: mime || undefined, length };
-  } finally {
-    clearTimeoutSignal(signal);
+  } catch {
+    return {};
   }
 }
 
 async function download(url, timeoutMs, maxBytes) {
-  const signal = getTimeoutSignal(timeoutMs);
-  try {
-    const res = await fetch(url, { method: "GET", signal });
-    if (!res.ok) {
-      throw new Error("Failed to download media");
-    }
-    const mime = res.headers.get("content-type")?.split(";")[0]?.trim();
-    const arrayBuffer = await res.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    if (buffer.length > maxBytes) {
-      throw new Error("Media exceeds max size");
-    }
-    return { buffer, mime: mime || undefined };
-  } finally {
-    clearTimeoutSignal(signal);
+  const res = await fetchWithRetry(url, { method: "GET" }, timeoutMs);
+  if (!res.ok) {
+    throw new Error("Failed to download media");
   }
+  const mime = res.headers.get("content-type")?.split(";")[0]?.trim();
+  const arrayBuffer = await res.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  if (buffer.length > maxBytes) {
+    throw new Error("Media exceeds max size");
+  }
+  return { buffer, mime: mime || undefined };
 }
 
 function computeHash(buffer) {
@@ -104,7 +123,7 @@ function resolveAssetPath(mime, hash, outputDir) {
   const folder = isVideo ? "videos" : "images";
   const fileName = `${hash}.${ext}`;
   const localPath = path.join(outputDir, "assets", folder, fileName);
-  const publicPath = `/assets/${folder}/${fileName}`;
+  const publicPath = `assets/${folder}/${fileName}`;
   return { localPath, publicPath };
 }
 
