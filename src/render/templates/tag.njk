@@ -53,30 +53,29 @@
   .post-item { border-bottom: 1px solid var(--border); }
   .post-item:first-child { border-top: 1px solid var(--border); }
   .post-link {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 1rem;
-    padding: 1.25rem 0;
+    display: block;
+    padding: 1.125rem 0;
     text-decoration: none;
     color: inherit;
-    transition: opacity 0.15s;
+    transition: transform 0.18s ease, opacity 0.18s ease;
   }
-  .post-link:hover { opacity: 0.7; }
-  .post-link-with-image { grid-template-columns: 1fr 80px; }
+  .post-link:hover {
+    transform: translateX(3px);
+    opacity: 0.8;
+  }
   .post-title {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--ink);
     letter-spacing: -0.015em;
-    line-height: 1.4;
-    margin-bottom: 0.25rem;
+    line-height: 1.45;
+    margin-bottom: 0.2rem;
   }
   .post-summary {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--ink-muted);
     line-height: 1.55;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -85,20 +84,11 @@
   .post-meta {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    font-size: 0.8125rem;
+    gap: 0.5rem;
+    font-size: 0.8rem;
     color: var(--ink-subtle);
   }
-  .post-meta-sep { opacity: 0.4; }
-  .post-thumb {
-    width: 80px;
-    height: 60px;
-    border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-    align-self: center;
-  }
+  .post-meta-sep { opacity: 0.35; }
 </style>
 {% endblock %}
 
@@ -117,23 +107,18 @@
   <ul class="post-list" role="list">
     {% for article in articles %}
     <li class="post-item">
-      <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
-        <div>
-          <h2 class="post-title">{{ article.title }}</h2>
-          {% if article.summary %}
-            <p class="post-summary">{{ article.summary }}</p>
-          {% endif %}
-          <div class="post-meta">
-            <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
-            {% if article.readingTime %}
-              <span class="post-meta-sep">·</span>
-              <span>{{ article.readingTime }} min</span>
-            {% endif %}
-          </div>
-        </div>
-        {% if article.image %}
-          <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
+      <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
+        <h2 class="post-title">{{ article.title }}</h2>
+        {% if article.summary %}
+          <p class="post-summary">{{ article.summary }}</p>
         {% endif %}
+        <div class="post-meta">
+          <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+          {% if article.readingTime %}
+            <span class="post-meta-sep">·</span>
+            <span>{{ article.readingTime }} min</span>
+          {% endif %}
+        </div>
       </a>
     </li>
     {% endfor %}
