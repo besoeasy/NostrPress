@@ -12,6 +12,9 @@
     {% if canonicalUrl %}
     <link rel="canonical" href="{{ canonicalUrl }}" />
     {% endif %}
+    {% if site.url %}
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS Feed" href="{{ site.url }}/feed.xml" />
+    {% endif %}
 
     <!-- Favicon and Icons -->
     <link rel="icon" type="image/x-icon" href="{{ pathPrefix }}favicon.ico" />

@@ -137,8 +137,25 @@ blog/
 
 ---
 
-## Environment variable
+## Environment variables
 
-| Variable | Description |
-|----------|-------------|
-| `NPUB`   | Your Nostr public key (`npub1...`) |
+| Variable   | Required | Description |
+|------------|----------|-------------|
+| `NPUB`     | ✅ yes   | Your Nostr public key (`npub1...`) |
+| `SITE_URL` | optional | Canonical base URL (e.g. `https://myblog.com`). When set, enables: RSS feed (`/feed.xml`), sitemap (`/sitemap.xml`), canonical link tags, and Open Graph absolute URLs. |
+
+### Example with SITE_URL
+
+```bash
+NPUB=npub1... SITE_URL=https://myblog.com npx github:besoeasy/NostrPress
+```
+
+This generates:
+
+```
+blog/
+├── feed.xml       ← RSS 2.0 feed (latest 20 posts)
+├── sitemap.xml    ← XML sitemap (all pages + tag pages)
+└── ...
+```
+

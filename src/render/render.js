@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import nunjucks from "nunjucks";
-import slugifyLib from "slugify";
+import { slugify, normalizeTag } from "../utils/slugify.js";
 
 const md = new MarkdownIt({
   html: false,
@@ -12,11 +12,6 @@ const md = new MarkdownIt({
   typographer: true
 });
 
-const slugify = slugifyLib;
-const normalizeTag = (tag) => {
-  const slug = slugify(tag, { lower: true, strict: true });
-  return slug || encodeURIComponent(String(tag).toLowerCase());
-};
 
 const sanitizer = (html) =>
   sanitizeHtml(html, {

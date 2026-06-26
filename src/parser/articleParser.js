@@ -1,7 +1,5 @@
-import slugifyLib from "slugify";
 import { nip19 } from "nostr-tools";
-
-const slugify = slugifyLib;
+import { slugify } from "../utils/slugify.js";
 
 function getTagValue(tags, name) {
   const tag = tags.find((t) => t[0] === name && t[1]);
@@ -36,7 +34,7 @@ export function parseArticle(event) {
   const tags = event.tags;
   const title = getTagValue(tags, "title") || extractTitle(event.content) || "Untitled";
   const slugFromTag = getTagValue(tags, "d");
-  const slug = slugFromTag || slugify(title, { lower: true, strict: true });
+  const slug = slugFromTag || slugify(title);
   const summary = getTagValue(tags, "summary") || "";
   const image = getTagValue(tags, "image");
   const publishedTag = getTagValue(tags, "published_at");
