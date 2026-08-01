@@ -8,58 +8,6 @@
 
 {% block additionalHead %}
 <style>
-  /* reuse post-list styles */
-  .post-list { list-style: none; }
-  .post-item { border-bottom: 1px solid var(--border); }
-  .post-item:first-child { border-top: 1px solid var(--border); }
-  .post-link {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 1rem;
-    padding: 1.25rem 0;
-    text-decoration: none;
-    color: inherit;
-    transition: opacity 0.15s;
-  }
-  .post-link:hover { opacity: 0.7; }
-  .post-link-with-image { grid-template-columns: 1fr 80px; }
-  .post-title {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: var(--ink);
-    letter-spacing: -0.015em;
-    line-height: 1.4;
-    margin-bottom: 0.25rem;
-  }
-  .post-summary {
-    font-size: 0.9rem;
-    color: var(--ink-muted);
-    line-height: 1.55;
-    margin-bottom: 0.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .post-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    font-size: 0.8125rem;
-    color: var(--ink-subtle);
-  }
-  .post-meta-sep { opacity: 0.4; }
-  .post-thumb {
-    width: 80px;
-    height: 60px;
-    border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-    align-self: center;
-  }
-
   .author-page-header {
     display: flex;
     align-items: flex-start;
@@ -148,7 +96,7 @@
     <ul class="post-list" role="list">
       {% for article in articles %}
       <li class="post-item">
-        <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link-with-image{% endif %}">
+        <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link--with-thumb{% endif %}">
           <div>
             <h2 class="post-title">{{ article.title }}</h2>
             {% if article.summary %}

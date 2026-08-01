@@ -83,6 +83,9 @@ export function createRenderer(templateDir) {
     }
     return date.toISOString();
   });
+  // Take the first `n` items of an array (Nunjucks' built-in `slice` splits
+  // into groups, so `| slice(0, n)` silently yields nothing).
+  env.addFilter("take", (arr, n) => (Array.isArray(arr) ? arr.slice(0, n) : []));
   return env;
 }
 
