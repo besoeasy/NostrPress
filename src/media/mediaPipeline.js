@@ -65,7 +65,7 @@ async function sleep(ms) {
 }
 
 const DEFAULT_HEADERS = {
-  "User-Agent": "NostrPress/1.0.0 (+https://github.com/besoeasy/NostrPress)",
+  "User-Agent": "NostrPress/0.0.1 (+https://github.com/besoeasy/NostrPress)",
   "Accept": "image/*,video/*,*/*;q=0.8"
 };
 

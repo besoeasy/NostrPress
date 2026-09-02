@@ -10,9 +10,9 @@ const pkgPath = path.join(packageRoot, "package.json");
 function getVersion() {
   try {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-    return pkg.version || "1.0.0";
+    return pkg.version || "0.0.1";
   } catch {
-    return "1.0.0";
+    return "0.0.1";
   }
 }
 
