@@ -64,12 +64,18 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const DEFAULT_HEADERS = {
+  "User-Agent": "NostrPress/1.0.0 (+https://github.com/besoeasy/NostrPress)",
+  "Accept": "image/*,video/*,*/*;q=0.8"
+};
+
 async function fetchWithRetry(url, options, timeoutMs, maxRetries = 3) {
   let lastError;
+  const headers = { ...DEFAULT_HEADERS, ...(options?.headers || {}) };
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const signal = getTimeoutSignal(timeoutMs);
     try {
-      const res = await fetch(url, { ...options, signal });
+      const res = await fetch(url, { ...options, headers, signal });
       clearTimeoutSignal(signal);
       return res;
     } catch (e) {
@@ -147,7 +153,19 @@ function isLikelyMediaUrl(url) {
     const parsed = new URL(url);
     const pathname = parsed.pathname.toLowerCase();
     const ext = pathname.includes(".") ? pathname.split(".").pop() || "" : "";
-    return COMMON_EXTENSIONS.has(ext);
+    if (COMMON_EXTENSIONS.has(ext)) return true;
+    const hostname = parsed.hostname.toLowerCase();
+    if (
+      hostname.includes("nostr.build") ||
+      hostname.includes("satellite.earth") ||
+      hostname.includes("void.cat") ||
+      hostname.includes("nostrcheck.me") ||
+      hostname.includes("primal.net") ||
+      hostname.includes("blossom")
+    ) {
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
@@ -168,6 +186,15 @@ export async function processMedia(articles, config) {
 
   const allUrls = new Set();
   for (const article of articles) {
+    // Explicit article media (always included)
+    if (article.image) {
+      const norm = normalizeUrl(article.image);
+      if (norm) allUrls.add(norm);
+    }
+    for (const u of article.imeta_urls || []) {
+      const norm = normalizeUrl(u);
+      if (norm) allUrls.add(norm);
+    }
     for (const url of discoverMediaUrls(article)) {
       const normalized = normalizeUrl(url);
       if (!normalized) continue;

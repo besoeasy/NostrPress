@@ -4,23 +4,47 @@ import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import nunjucks from "nunjucks";
+import hljs from "highlight.js";
 import { slugify, normalizeTag } from "../utils/slugify.js";
 
 const md = new MarkdownIt({
   html: false,
   linkify: true,
-  typographer: true
+  typographer: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return `<pre class="hljs"><code class="hljs language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`;
+      } catch (__) {}
+    }
+    try {
+      return `<pre class="hljs"><code class="hljs">${hljs.highlightAuto(str).value}</code></pre>`;
+    } catch (__) {}
+    return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
+  }
 });
-
 
 const sanitizer = (html) =>
   sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "h3", "h4", "h5", "h6"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      "img",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "span",
+      "details",
+      "summary"
+    ]),
     allowedAttributes: {
       a: ["href", "name", "target", "rel"],
       img: ["src", "alt", "title", "loading"],
       code: ["class"],
       pre: ["class"],
+      span: ["class"],
+      details: ["open"],
       '*': ["class", "id"]
     },
     allowedSchemes: ["http", "https", "mailto"],
