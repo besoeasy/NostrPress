@@ -14,7 +14,7 @@
     gap: 1.25rem;
     margin-bottom: 3rem;
     padding-bottom: 2.5rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-light);
   }
   .author-page-avatar {
     width: 72px;
@@ -61,12 +61,21 @@
     max-width: 52ch;
   }
   .section-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-subtle);
     margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
   }
 </style>
 {% endblock %}
@@ -97,7 +106,10 @@
       {% for article in articles %}
       <li class="post-item">
         <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link--with-thumb{% endif %}">
-          <div>
+          {% if article.image %}
+            <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
+          {% endif %}
+          <div class="post-body">
             <h2 class="post-title">{{ article.title }}</h2>
             {% if article.summary %}
               <p class="post-summary">{{ article.summary }}</p>
@@ -106,13 +118,10 @@
               <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
               {% if article.readingTime %}
                 <span class="post-meta-sep">·</span>
-                <span>{{ article.readingTime }} min</span>
+                <span>{{ article.readingTime }} min read</span>
               {% endif %}
             </div>
           </div>
-          {% if article.image %}
-            <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
-          {% endif %}
         </a>
       </li>
       {% endfor %}

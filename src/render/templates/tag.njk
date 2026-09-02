@@ -17,26 +17,28 @@
     color: var(--ink-muted);
     text-decoration: none;
     margin-bottom: 2.5rem;
-    transition: color 0.15s;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s, background 0.15s;
   }
-  .tag-back:hover { color: var(--ink); }
+  .tag-back:hover { color: var(--ink); background: var(--surface-alt); }
   .tag-back svg { width: 15px; height: 15px; }
 
   .tag-header {
     margin-bottom: 2.5rem;
   }
   .tag-eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--ink-subtle);
+    color: var(--accent);
     margin-bottom: 0.5rem;
   }
   .tag-title {
-    font-size: clamp(1.5rem, 4vw, 2.25rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 750;
+    letter-spacing: -0.04em;
     color: var(--ink);
     line-height: 1.2;
   }
@@ -63,17 +65,22 @@
   <ul class="post-list" role="list">
     {% for article in articles %}
     <li class="post-item">
-      <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
-        <h2 class="post-title">{{ article.title }}</h2>
-        {% if article.summary %}
-          <p class="post-summary">{{ article.summary }}</p>
+      <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link--with-thumb{% endif %}">
+        {% if article.image %}
+          <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
         {% endif %}
-        <div class="post-meta">
-          <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
-          {% if article.readingTime %}
-            <span class="post-meta-sep">·</span>
-            <span>{{ article.readingTime }} min</span>
+        <div class="post-body">
+          <h2 class="post-title">{{ article.title }}</h2>
+          {% if article.summary %}
+            <p class="post-summary">{{ article.summary }}</p>
           {% endif %}
+          <div class="post-meta">
+            <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+            {% if article.readingTime %}
+              <span class="post-meta-sep">·</span>
+              <span>{{ article.readingTime }} min read</span>
+            {% endif %}
+          </div>
         </div>
       </a>
     </li>

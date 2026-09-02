@@ -20,7 +20,7 @@
         ? "light"
         : "dark";
     document.documentElement.setAttribute("data-theme", next);
-    if (meta) meta.setAttribute("content", next === "dark" ? "#0a0a0a" : "#ffffff");
+    if (meta) meta.setAttribute("content", next === "dark" ? "#0f172a" : "#ffffff");
     try {
       localStorage.setItem("theme", next);
     } catch (e) {
