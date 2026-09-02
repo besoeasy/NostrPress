@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { SimplePool } from "nostr-tools";
 import { loadConfig } from "./config/loadConfig.js";
-import { resolveIdentity, fetchProfileMetadata, fetchArticles, fetchComments } from "./nostr/client.js";
+import { resolveIdentity, fetchUserRelays, fetchProfileMetadata, fetchArticles, fetchComments } from "./nostr/client.js";
 import { parseArticle } from "./parser/articleParser.js";
 import { processMedia, rewriteArticleContent } from "./media/mediaPipeline.js";
 import { renderMarkdown, renderSite } from "./render/render.js";
@@ -265,16 +265,18 @@ async function run() {
   stepDone(`→ ${identity.npub.slice(0, 16)}…`);
 
   const pool = new SimplePool();
+  const authorRelays = await fetchUserRelays(pool, identity.relays, identity.pubkey);
+  const activeRelays = Array.from(new Set([...identity.relays, ...authorRelays]));
 
   // ── Step 2: Fetch profile ──────────────────────────────────────────────────
   step("Fetching profile");
-  const profile = await fetchProfileMetadata(pool, identity.relays, identity.pubkey);
+  const profile = await fetchProfileMetadata(pool, activeRelays, identity.pubkey);
   const displayName = profile.display_name || profile.name || identity.npub.slice(0, 12);
   stepDone(`→ ${displayName}`);
 
   // ── Step 3: Fetch articles ─────────────────────────────────────────────────
   step("Fetching articles");
-  const events = await fetchArticles(pool, config, identity.pubkey);
+  const events = await fetchArticles(pool, activeRelays, config, identity.pubkey);
   const parsed = events.map(parseArticle);
   const sorted = sortArticles(parsed);
   const withSummary = sorted.map((article) => ({
@@ -286,8 +288,8 @@ async function run() {
   // ── Step 4: Fetch comments ─────────────────────────────────────────────────
   step("Fetching comments");
   const articleEventIds = withSummary.map((a) => a.id);
-  const commentsMap = await fetchComments(pool, identity.relays, articleEventIds);
-  await pool.close(identity.relays);
+  const commentsMap = await fetchComments(pool, activeRelays, articleEventIds);
+  await pool.close(activeRelays);
   const totalComments = [...commentsMap.values()].reduce((acc, c) => acc + c.length, 0);
   stepDone(`→ ${totalComments} comment${totalComments !== 1 ? "s" : ""}`);
 

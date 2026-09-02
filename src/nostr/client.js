@@ -25,6 +25,24 @@ export function resolveIdentity(input, fallbackRelays) {
   throw new Error("Input must be npub or nprofile");
 }
 
+export async function fetchUserRelays(pool, relays, pubkey) {
+  try {
+    const filter = { kinds: [10002], authors: [pubkey], limit: 5 };
+    const events = await pool.querySync(relays, filter);
+    if (!events.length) return [];
+    const latest = events.sort((a, b) => b.created_at - a.created_at)[0];
+    const userRelays = [];
+    for (const tag of latest.tags) {
+      if (tag[0] === "r" && tag[1] && (tag[1].startsWith("wss://") || tag[1].startsWith("ws://"))) {
+        userRelays.push(tag[1]);
+      }
+    }
+    return userRelays;
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchProfileMetadata(pool, relays, pubkey) {
   const cacheKey = `profile-${pubkey}`;
   const cached = cache.get(cacheKey);
@@ -63,7 +81,21 @@ function collectDeletedIds(events) {
   return deleted;
 }
 
-export async function fetchArticles(pool, config, pubkey) {
+export async function fetchArticles(pool, relaysOrConfig, configOrPubkey, maybePubkey) {
+  let relays;
+  let config;
+  let pubkey;
+
+  if (Array.isArray(relaysOrConfig)) {
+    relays = relaysOrConfig;
+    config = configOrPubkey;
+    pubkey = maybePubkey;
+  } else {
+    config = relaysOrConfig;
+    pubkey = configOrPubkey;
+    relays = config.relays;
+  }
+
   const cacheKey = `articles-${pubkey}-${JSON.stringify(config.fetch)}`;
   const cached = cache.get(cacheKey);
   if (cached) {
@@ -72,7 +104,6 @@ export async function fetchArticles(pool, config, pubkey) {
   }
 
   console.log(`Fetching articles for ${pubkey}...`);
-  const relays = config.relays;
   const filters = [];
 
   const baseFilter = {
