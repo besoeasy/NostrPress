@@ -15,17 +15,23 @@ Turn your [Nostr](https://nostr.com) long-form posts into a static blog. One com
 
 ## Run it
 
-**npx**
+**Direct CLI Arguments**
 ```bash
-NPUB=npub1... npx github:besoeasy/NostrPress
+npx nostrpress npub1...
+npx nostrpress npub1... --out ./public/blog --url https://myblog.com
 ```
 
-**bun**
+**Environment Variables**
 ```bash
-NPUB=npub1... bunx github:besoeasy/NostrPress
+NPUB=npub1... npx nostrpress
 ```
 
-Output lands in `./blog/` — ready to serve.
+**Bun**
+```bash
+bunx nostrpress npub1...
+```
+
+Output lands in `./blog/` (or your `--out` path) — ready to serve.
 
 ---
 
@@ -132,30 +138,48 @@ blog/
 ├── css/
 │   └── site.css
 └── js/
-    └── site.js
-```
+## CLI Options & Flags
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `<npub_or_nprofile>` | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) | Positional |
+| `-n, --npub <key>` | Explicit flag for `npub` or `nprofile` | `$NPUB` |
+| `-o, --out <dir>` | Output folder for static blog | `./blog` |
+| `-u, --url <url>` | Canonical site URL (enables RSS feed, sitemap & SEO tags) | `$SITE_URL` |
+| `-r, --relay <relay>` | Custom relay URL (can be specified multiple times) | Default relays |
+| `-c, --clean` | Clear local cache before building | `false` |
+| `--no-media` | Skip downloading media assets locally | `false` |
+| `-h, --help` | Show help message | — |
+| `-v, --version` | Show version | — |
 
 ---
 
 ## Environment variables
 
-| Variable   | Required | Description |
-|------------|----------|-------------|
-| `NPUB`     | ✅ yes   | Your Nostr public key (`npub1...`) |
-| `SITE_URL` | optional | Canonical base URL (e.g. `https://myblog.com`). When set, enables: RSS feed (`/feed.xml`), sitemap (`/sitemap.xml`), canonical link tags, and Open Graph absolute URLs. |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NPUB` | ✅ yes (or pass as arg) | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) |
+| `SITE_URL` | optional | Canonical base URL (e.g. `https://myblog.com`). Enables RSS (`/feed.xml`), sitemap (`/sitemap.xml`), and canonical link tags. |
+| `OUTPUT_DIR` | optional | Output destination (default: `./blog`) |
+| `RELAYS` | optional | Comma-separated list of custom relays |
+| `CLEAN` | optional | Set to `true` to clear cache before build |
 
-### Example with SITE_URL
+### Example with Site URL & Custom Output
 
 ```bash
-NPUB=npub1... SITE_URL=https://myblog.com npx github:besoeasy/NostrPress
+npx nostrpress npub1... --out ./public/blog --url https://myblog.com
 ```
 
 This generates:
 
 ```
-blog/
+public/blog/
+├── index.html     ← homepage with all posts & profile
 ├── feed.xml       ← RSS 2.0 feed (latest 20 posts)
 ├── sitemap.xml    ← XML sitemap (all pages + tag pages)
+├── tags/          ← tag archive pages
+├── assets/        ← locally downloaded and cached media
 └── ...
 ```
+
 

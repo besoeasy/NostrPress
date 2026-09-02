@@ -249,7 +249,23 @@ ${urls.join("\n")}
 async function run() {
   const config = loadConfig();
   if (!config.input.npub_or_nprofile) {
-    throw new Error("NPUB environment variable is required");
+    console.error(`
+  ✗ Error: Nostr public key (npub1...) or profile (nprofile1...) is required.
+
+  Usage:
+    npx nostrpress <npub_or_nprofile> [options]
+    NPUB=npub1... npx nostrpress
+
+  Run \`nostrpress --help\` for full list of options.
+`);
+    process.exit(1);
+  }
+
+  if (config.clean) {
+    const cacheDir = path.resolve(process.cwd(), "nostr-cache");
+    if (fs.existsSync(cacheDir)) {
+      fs.rmSync(cacheDir, { recursive: true, force: true });
+    }
   }
 
   const hasSiteUrl = Boolean(config.site.url);
