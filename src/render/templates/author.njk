@@ -8,79 +8,81 @@
 
 {% block additionalHead %}
 <style>
+  .author-sheet {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 5px 5px 0 var(--border-strong);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    margin-bottom: 1.25rem;
+  }
   .author-page-header {
     display: flex;
     align-items: flex-start;
     gap: 1.25rem;
-    margin-bottom: 3rem;
-    padding-bottom: 2.5rem;
-    border-bottom: 1px solid var(--border-light);
   }
   .author-page-avatar {
-    width: 72px;
-    height: 72px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--border);
+    border: 3px solid var(--border-strong);
     flex-shrink: 0;
   }
   .author-page-avatar-placeholder {
-    width: 72px;
-    height: 72px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
-    background: var(--surface-alt);
-    border: 2px solid var(--border);
+    background: var(--ink);
+    color: var(--paper);
+    border: 3px solid var(--border-strong);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--ink-muted);
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 900;
     flex-shrink: 0;
   }
   .author-page-meta { flex: 1; min-width: 0; }
   .author-page-name {
-    font-size: 1.375rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    color: var(--ink);
-    line-height: 1.25;
-    margin-bottom: 0.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 0.35rem;
   }
   .author-page-npub {
-    font-family: ui-monospace, 'SF Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--ink-subtle);
     margin-bottom: 0.625rem;
     word-break: break-all;
   }
   .author-page-bio {
-    font-size: 0.9375rem;
+    font-size: 0.95rem;
     color: var(--ink-muted);
-    line-height: 1.6;
+    line-height: 1.65;
     max-width: 52ch;
   }
   .section-label {
-    font-size: 0.8125rem;
-    font-weight: 650;
-    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-subtle);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .section-label span { background: var(--ink); color: var(--paper); padding: 0.3rem 0.8rem; border-radius: 100px; white-space: nowrap; }
+  .section-label::after { content: ''; flex: 1; height: 2px; background: var(--border-strong); }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="author-sheet">
   <header class="author-page-header">
     {% if author.profile.picture %}
       <img src="{{ author.profile.picture }}" alt="{{ author.profile.display_name or author.profile.name }}" class="author-page-avatar" />
@@ -99,16 +101,21 @@
       {% endif %}
     </div>
   </header>
+</div>
 
   {% if articles.length > 0 %}
-    <p class="section-label">All posts</p>
+    <p class="section-label"><span>Archive · {{ articles.length }}</span></p>
     <ul class="post-list" role="list">
       {% for article in articles %}
       <li class="post-item">
-        <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link--with-thumb{% endif %}">
-          {% if article.image %}
-            <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
-          {% endif %}
+        <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
+          <span class="post-thumb-wrap">
+            {% if article.image %}
+              <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" />
+            {% else %}
+              <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
+            {% endif %}
+          </span>
           <div class="post-body">
             <h2 class="post-title">{{ article.title }}</h2>
             {% if article.summary %}
@@ -118,7 +125,7 @@
               <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
               {% if article.readingTime %}
                 <span class="post-meta-sep">·</span>
-                <span>{{ article.readingTime }} min read</span>
+                <span>{{ article.readingTime }} min</span>
               {% endif %}
             </div>
           </div>

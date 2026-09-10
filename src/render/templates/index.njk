@@ -45,210 +45,141 @@
 }
 </script>
 <style>
-  /* ── Index-page styles ──────────────────────────── */
-
-  /* ── Author profile hero ──────────────────────────── */
-  .index-author {
-    text-align: center;
-    margin-bottom: 3.5rem;
-    padding: 2rem 0 2.5rem;
-  }
-
-  .index-avatar-wrap {
-    display: inline-block;
+  /* ── Front page ─────────────────────────────── */
+  .cover {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 5px 5px 0 var(--border-strong);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
     margin-bottom: 1.25rem;
   }
-  .index-avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    border: 3px solid var(--border);
-    box-shadow: 0 0 0 4px var(--surface), 0 0 0 5px var(--border-light);
+  @media (max-width: 860px) { .cover { grid-template-columns: 1fr; } }
+  .cover-main { padding: 2.2rem 2.2rem 2rem; display: flex; flex-direction: column; justify-content: center; }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--surface); background: var(--accent); padding: 0.3rem 0.7rem; border-radius: 100px;
+    margin-bottom: 1rem; width: fit-content;
   }
-  .index-avatar-placeholder {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background: var(--surface-alt);
-    border: 3px solid var(--border);
-    box-shadow: 0 0 0 4px var(--surface), 0 0 0 5px var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--ink-muted);
+  .kicker.alt { background: var(--ink); color: var(--paper); }
+  .cover-title {
+    font-family: var(--font-display); font-weight: 900; letter-spacing: -0.035em; line-height: 0.98;
+    font-size: clamp(2rem, 4.5vw, 3.4rem); margin-bottom: 1rem;
   }
+  .cover-title a { color: inherit; text-decoration: none; }
+  .cover-title a:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
+  .cover-dek { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--ink-muted); line-height: 1.55; margin-bottom: 1.25rem; }
+  .byline { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.4rem; }
+  .byline-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-strong); }
+  .byline-avatar-fallback { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-weight: 800; font-family: var(--font-display); }
+  .byline-name { font-weight: 700; font-size: 0.9rem; }
+  .byline-date { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-subtle); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; font-size: 0.9rem;
+    padding: 0.7rem 1.2rem; border-radius: 100px; border: 1px solid var(--ink); width: fit-content;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--accent); }
+  .cover-art { background: var(--surface-alt); border-left: 1px solid var(--border); min-height: 320px; position: relative; overflow: hidden; }
+  @media (max-width: 860px) { .cover-art { border-left: none; border-top: 1px solid var(--border); min-height: 240px; } }
+  .cover-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cover-art-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 900; font-size: 6rem; color: var(--border-strong); background: repeating-linear-gradient(-45deg, transparent 0 14px, rgba(0,0,0,0.05) 14px 15px), var(--surface-alt); }
 
-  .index-author-name {
-    font-size: 1.625rem;
-    font-weight: 750;
-    color: var(--ink);
-    letter-spacing: -0.035em;
-    line-height: 1.2;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 0.5rem;
-    transition: opacity 0.15s;
+  .section-bar {
+    display: flex; align-items: center; gap: 0.9rem; margin: 1.8rem auto 1.1rem;
+    max-width: 780px;
   }
-  .index-author-name:hover { opacity: 0.65; }
+  .section-bar h2 { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; background: var(--ink); color: var(--paper); padding: 0.35rem 0.8rem; border-radius: 100px; white-space: nowrap; }
+  .section-bar::after { content: ''; flex: 1; height: 2px; background: var(--border-strong); }
+  .section-count { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-subtle); white-space: nowrap; }
 
-  .index-author-bio {
-    font-size: 0.9375rem;
-    color: var(--ink-muted);
-    line-height: 1.65;
-    max-width: 44ch;
-    margin: 0 auto 1.5rem;
+  /* ── Single-column story list ─────────────── */
+  .stories { max-width: 780px; margin: 0 auto; }
+  .stories .post-list { grid-template-columns: 1fr; }
+  .stories .post-link { flex-direction: row; align-items: stretch; }
+  .stories .post-thumb-wrap {
+    width: 260px; min-width: 260px; aspect-ratio: auto; min-height: 100%;
+    border-bottom: none; border-right: 1px solid var(--border);
   }
-
-  /* Social links as pills */
-  .index-author-links {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-  .profile-link {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--ink-muted);
-    text-decoration: none;
-    padding: 0.35rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-  .profile-link:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 6%, transparent);
-  }
-  .profile-link svg { width: 13px; height: 13px; flex-shrink: 0; }
-
-  /* ── Section label ─────────────────────────────── */
-  .section-heading {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .section-heading h2 {
-    font-size: 0.8125rem;
-    font-weight: 650;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-subtle);
-    white-space: nowrap;
-  }
-  .section-heading::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
+  .stories .post-body { padding: 1.25rem 1.35rem; justify-content: center; }
+  .stories .post-title { font-size: 1.35rem; }
+  @media (max-width: 640px) {
+    .stories .post-link { flex-direction: column; }
+    .stories .post-thumb-wrap {
+      width: 100%; min-width: 0; aspect-ratio: 16 / 9; min-height: 0;
+      border-right: none; border-bottom: 1px solid var(--border);
+    }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-  <div>
-    {# Author block #}
-    {% if author %}
-    <div class="index-author">
-      <div class="index-avatar-wrap">
-        {% if author.profile.picture %}
-          <img src="{{ author.profile.picture }}" alt="{{ author.profile.display_name or author.profile.name }}" class="index-avatar" />
-        {% else %}
-          <div class="index-avatar-placeholder" aria-hidden="true">
-            {{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}
+  {% if articles.length > 0 %}
+    {% set featured = articles[0] %}
+    <article class="cover">
+      <div class="cover-main">
+        <span class="kicker">★ Cover story</span>
+        <h1 class="cover-title"><a href="{{ pathPrefix }}{{ featured.slug }}.html">{{ featured.title }}</a></h1>
+        {% if featured.summary %}<p class="cover-dek">{{ featured.summary }}</p>{% endif %}
+        <div class="byline">
+          {% if author.profile.picture %}
+            <img src="{{ author.profile.picture }}" alt="" class="byline-avatar" />
+          {% else %}
+            <div class="byline-avatar-fallback">{{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}</div>
+          {% endif %}
+          <div>
+            <div class="byline-name">{{ author.profile.display_name or author.profile.name or site.title }}</div>
+            <div class="byline-date"><time datetime="{{ featured.published_at | date('iso') }}">{{ featured.published_at | date("Y-m-d") }}</time>{% if featured.readingTime %} · {{ featured.readingTime }} min read{% endif %}</div>
           </div>
-        {% endif %}
+        </div>
+        <a class="btn" href="{{ pathPrefix }}{{ featured.slug }}.html">Read story →</a>
       </div>
+      <a class="cover-art" href="{{ pathPrefix }}{{ featured.slug }}.html" aria-label="{{ featured.title }}">
+        {% if featured.image %}
+          <img src="{{ featured.image }}" alt="" loading="eager" />
+        {% else %}
+          <div class="cover-art-fallback">{{ featured.title[0] | upper }}</div>
+        {% endif %}
+      </a>
+    </article>
 
-      <a href="{{ pathPrefix }}" class="index-author-name">{{ author.profile.display_name or author.profile.name or site.title }}</a>
-
-      {% if author.profile.about %}
-        <p class="index-author-bio">{{ author.profile.about }}</p>
-      {% endif %}
-
-      <nav class="index-author-links" aria-label="Author links">
-        {% if author.profile.website %}
-        <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="Website">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-          Website
-        </a>
-        {% endif %}
-        {% if author.profile.twitter %}
-        <a href="https://twitter.com/{{ author.profile.twitter }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="Twitter / X">
-          <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          Twitter
-        </a>
-        {% endif %}
-        {% if author.profile.github %}
-        <a href="https://github.com/{{ author.profile.github }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="GitHub">
-          <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02.004 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.19.69.8.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
-        </a>
-        {% endif %}
-        {% if author.npub %}
-        <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="Nostr profile">
-          <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
-          Nostr
-        </a>
-        {% endif %}
-        {% if author.profile.telegram %}
-        <a href="https://t.me/{{ author.profile.telegram }}" target="_blank" rel="noopener noreferrer" class="profile-link" aria-label="Telegram">
-          <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-          Telegram
-        </a>
-        {% endif %}
-      </nav>
-    </div>
-    {% endif %}
-
-    {# Post list #}
-    {% if articles.length > 0 %}
-      <div class="section-heading">
-        <h2>All posts</h2>
-      </div>
-      <ul class="post-list" role="list">
-        {% for article in articles %}
-        <li class="post-item">
-          <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link {% if article.image %}post-link--with-thumb{% endif %}">
-            {% if article.image %}
-              <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" aria-hidden="true" />
-            {% endif %}
-            <div class="post-body">
-              <h2 class="post-title">{{ article.title }}</h2>
-              {% if article.summary %}
-                <p class="post-summary">{{ article.summary }}</p>
-              {% endif %}
-              <div class="post-meta">
-                <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
-                {% if article.readingTime %}
-                  <span class="post-meta-sep">·</span>
-                  <span>{{ article.readingTime }} min read</span>
+    <div class="stories">
+        <div class="section-bar"><h2>Latest stories</h2><span class="section-count">{{ articles.length }} articles</span></div>
+        <ul class="post-list" role="list">
+          {% for article in articles | take(999) %}
+          {% if not loop.first %}
+          <li class="post-item">
+            <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
+              <span class="post-thumb-wrap">
+                {% if article.image %}
+                  <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" />
+                {% else %}
+                  <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
+                {% endif %}
+              </span>
+              <div class="post-body">
+                <p class="post-kicker">{% if article.tags.length %}{{ article.tags[0] }}{% else %}Story{% endif %} · Nº {{ loop.index }}</p>
+                <h2 class="post-title">{{ article.title }}</h2>
+                {% if article.summary %}<p class="post-summary">{{ article.summary }}</p>{% endif %}
+                <div class="post-meta">
+                  <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+                  {% if article.readingTime %}<span class="post-meta-sep">·</span><span>{{ article.readingTime }} min</span>{% endif %}
+                </div>
+                {% if article.tags.length %}
+                  <div class="post-tags">{% for tag in article.tags | take(3) %}<span class="post-tag">#{{ tag }}</span>{% endfor %}</div>
                 {% endif %}
               </div>
-              {% if article.tags.length %}
-                <div class="post-tags">
-                  {% for tag in article.tags | take(4) %}
-                    <span class="post-tag">#{{ tag }}</span>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p style="color: var(--ink-muted); font-size: 0.9375rem;">No posts yet.</p>
-    {% endif %}
-  </div>
+            </a>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+    </div>
+  {% else %}
+    <p style="color: var(--ink-muted);">No posts yet.</p>
+  {% endif %}
 {% endblock %}
