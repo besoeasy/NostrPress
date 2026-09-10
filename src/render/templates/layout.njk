@@ -412,26 +412,6 @@
         font-size: 0.9rem;
       }
       .footer-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
-      .footer-npub {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.8rem;
-        color: var(--paper);
-        cursor: pointer;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.18);
-        padding: 0.5rem 0.75rem;
-        border-radius: 100px;
-        font-family: var(--font-mono);
-        transition: background 0.15s;
-        margin-top: 1rem;
-      }
-      .footer-npub:hover { background: rgba(255,255,255,0.14); }
-      .footer-npub code {
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-      }
       .footer-bottom {
         max-width: var(--max-w);
         margin: 0 auto;
@@ -654,17 +634,6 @@
         <div>
           <p class="footer-brand">{{ site.title }}<span class="brand-dot">.</span></p>
           <p class="footer-text">{{ site.description | truncate(160) if site.description else 'Long-form writing published on Nostr.' }} Built with <a href="https://github.com/besoeasy/NostrPress" target="_blank" rel="noopener noreferrer">NostrPress</a>.</p>
-          {% if author and author.npub %}
-          <button
-            class="footer-npub"
-            onclick="navigator.clipboard.writeText('{{ author.npub }}'); this.querySelector('span').textContent='Copied!'; setTimeout(()=>this.querySelector('span').textContent='{{ author.npub | truncate(20) }}…', 2000)"
-            aria-label="Copy Nostr public key"
-            title="{{ author.npub }}"
-          >
-            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/></svg>
-            <code><span>{{ author.npub | truncate(20) }}…</span></code>
-          </button>
-          {% endif %}
         </div>
         <div>
           <p class="footer-h">Explore</p>
