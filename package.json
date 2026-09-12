@@ -1,6 +1,6 @@
 {
   "name": "nostrpress",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Turn your Nostr long-form posts (NIP-23) into a fast, standalone static blog.",
   "author": "Aman Singh Kattal (https://besoeasy.com)",
   "license": "MIT",
