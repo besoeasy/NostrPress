@@ -31,9 +31,21 @@ export class CacheManager {
 
   save() {
     try {
+      this.ensureCacheDir();
       fs.writeFileSync(this.cacheFile, JSON.stringify(this.cache, null, 2), "utf-8");
     } catch (error) {
       console.warn("Failed to save cache.", error);
+    }
+  }
+
+  clear() {
+    this.cache = {};
+    if (fs.existsSync(this.cacheFile)) {
+      try {
+        fs.unlinkSync(this.cacheFile);
+      } catch (error) {
+        // ignore
+      }
     }
   }
 
@@ -58,3 +70,4 @@ export class CacheManager {
     this.save();
   }
 }
+

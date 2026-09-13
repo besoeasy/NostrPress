@@ -1,3 +1,9 @@
+import dns from "node:dns";
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {}
+
+import "./nostr/ws.js";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
@@ -6,9 +12,9 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { SimplePool } from "nostr-tools";
 import { loadConfig } from "./config/loadConfig.js";
-import { resolveIdentity, fetchUserRelays, fetchProfileMetadata, fetchArticles, fetchComments } from "./nostr/client.js";
+import { resolveIdentity, fetchUserRelays, fetchProfileMetadata, fetchArticles, fetchComments, clearClientCache } from "./nostr/client.js";
 import { parseArticle } from "./parser/articleParser.js";
-import { processMedia, rewriteArticleContent } from "./media/mediaPipeline.js";
+import { processMedia, rewriteArticleContent, clearMediaCache } from "./media/mediaPipeline.js";
 import { renderMarkdown, renderSite } from "./render/render.js";
 import { normalizeTag } from "./utils/slugify.js";
 
@@ -262,6 +268,8 @@ async function run() {
   }
 
   if (config.clean) {
+    clearClientCache();
+    clearMediaCache();
     const cacheDir = path.resolve(process.cwd(), "nostr-cache");
     if (fs.existsSync(cacheDir)) {
       fs.rmSync(cacheDir, { recursive: true, force: true });
@@ -281,6 +289,7 @@ async function run() {
   stepDone(`→ ${identity.npub.slice(0, 16)}…`);
 
   const pool = new SimplePool();
+  pool.maxWaitForConnection = config?.timeouts?.network_ms || 10000;
   const authorRelays = await fetchUserRelays(pool, identity.relays, identity.pubkey);
   const activeRelays = Array.from(new Set([...identity.relays, ...authorRelays]));
 

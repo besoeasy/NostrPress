@@ -7,6 +7,10 @@ import { CacheManager } from "../cache/cacheManager.js";
 
 const mediaCache = new CacheManager("nostr-cache/media-map.json", 24 * 365); // Long cache for media (1 year)
 
+export function clearMediaCache() {
+  mediaCache.clear();
+}
+
 const COMMON_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",

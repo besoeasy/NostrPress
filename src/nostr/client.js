@@ -1,7 +1,12 @@
+import "./ws.js";
 import { SimplePool, nip19 } from "nostr-tools";
 import { CacheManager } from "../cache/cacheManager.js";
 
 const cache = new CacheManager();
+
+export function clearClientCache() {
+  cache.clear();
+}
 
 export function resolveIdentity(input, fallbackRelays) {
   if (input.startsWith("npub")) {
@@ -28,7 +33,7 @@ export function resolveIdentity(input, fallbackRelays) {
 export async function fetchUserRelays(pool, relays, pubkey) {
   try {
     const filter = { kinds: [10002], authors: [pubkey], limit: 5 };
-    const events = await pool.querySync(relays, filter);
+    const events = await pool.querySync(relays, filter, { maxWait: 10000 });
     if (!events.length) return [];
     const latest = events.sort((a, b) => b.created_at - a.created_at)[0];
     const userRelays = [];
@@ -53,7 +58,7 @@ export async function fetchProfileMetadata(pool, relays, pubkey) {
 
   console.log(`Fetching profile for ${pubkey}...`);
   const filter = { kinds: [0], authors: [pubkey], limit: 10 };
-  const events = await pool.querySync(relays, filter);
+  const events = await pool.querySync(relays, filter, { maxWait: 10000 });
   const latest = events.sort((a, b) => b.created_at - a.created_at)[0];
   if (!latest || !latest.content) {
     return {};
@@ -125,9 +130,10 @@ export async function fetchArticles(pool, relaysOrConfig, configOrPubkey, maybeP
     until: config.fetch.until
   };
 
+  const maxWait = config?.timeouts?.network_ms || 10000;
   const [events, deletions] = await Promise.all([
-    Promise.all(filters.map(f => pool.querySync(relays, f))).then(results => results.flat()),
-    pool.querySync(relays, deletionFilter)
+    Promise.all(filters.map(f => pool.querySync(relays, f, { maxWait }))).then(results => results.flat()),
+    pool.querySync(relays, deletionFilter, { maxWait })
   ]);
 
   const deletedIds = collectDeletedIds(deletions);
@@ -141,7 +147,9 @@ export async function fetchArticles(pool, relaysOrConfig, configOrPubkey, maybeP
   }
 
   const result = Array.from(deduped.values());
-  cache.set(cacheKey, result);
+  if (result.length > 0) {
+    cache.set(cacheKey, result);
+  }
   return result;
 }
 
@@ -154,7 +162,7 @@ export async function fetchComments(pool, relays, articleEventIds) {
     "#e": articleEventIds
   };
 
-  const events = await pool.querySync(relays, filter);
+  const events = await pool.querySync(relays, filter, { maxWait: 10000 });
   const commentsByArticle = new Map();
 
   // Group comments by article event ID
@@ -178,7 +186,7 @@ export async function fetchComments(pool, relays, articleEventIds) {
       kinds: [0],
       authors: authorPubkeys
     };
-    const profileEvents = await pool.querySync(relays, profileFilter);
+    const profileEvents = await pool.querySync(relays, profileFilter, { maxWait: 10000 });
     
     for (const event of profileEvents) {
       try {

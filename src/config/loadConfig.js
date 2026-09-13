@@ -37,6 +37,7 @@ export function printHelp() {
         --relays <relays>    Comma-separated list of custom Nostr relays
     -c, --clean              Clear local cache before building
         --no-media           Skip downloading media assets
+        --notes, --include-kind1  Include kind 1 short notes alongside articles
     -h, --help               Display this help message
     -v, --version            Display version number
 
@@ -65,6 +66,8 @@ export function loadConfig(argv = process.argv.slice(2)) {
         relays: { type: "string" },
         clean: { type: "boolean", short: "c", default: false },
         "no-media": { type: "boolean", default: false },
+        "include-kind1": { type: "boolean", default: false },
+        notes: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
         version: { type: "boolean", short: "v", default: false }
       },
@@ -111,6 +114,7 @@ export function loadConfig(argv = process.argv.slice(2)) {
 
   const cleanCache = Boolean(values.clean || process.env.CLEAN);
   const downloadMedia = values["no-media"] ? false : defaultConfig.media.download;
+  const includeKind1 = Boolean(values["include-kind1"] || values.notes || process.env.INCLUDE_KIND1);
 
   return {
     ...defaultConfig,
@@ -127,6 +131,10 @@ export function loadConfig(argv = process.argv.slice(2)) {
     media: {
       ...defaultConfig.media,
       download: downloadMedia
+    },
+    fetch: {
+      ...defaultConfig.fetch,
+      include_kind1: includeKind1
     }
   };
 }

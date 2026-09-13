@@ -8,7 +8,10 @@ export const defaultConfig = {
     "wss://relay.primal.net",
     "wss://relay.nostr.band",
     "wss://relay.snort.social",
-    "wss://purplepag.es"
+    "wss://purplepag.es",
+    "wss://nostr.mom",
+    "wss://nostr-pub.wellorder.net",
+    "wss://user.kindpag.es"
   ],
   trusted_only: true,
   output_dir: "./blog",
