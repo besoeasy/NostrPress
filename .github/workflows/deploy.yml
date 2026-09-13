@@ -64,6 +64,7 @@ jobs:
           # Edge case: normalize http -> https
           URL="${URL/http:\/\//https:\/\/}"
           echo "url=${URL}" >> "$GITHUB_OUTPUT"
+          echo "Computed GitHub Pages URL: ${URL}"
 
       - name: Build static blog
         env:
