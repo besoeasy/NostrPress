@@ -240,24 +240,6 @@
       .skip-link:focus { top: 0; }
 
       /* ── Masthead / Header ─────────────────────────── */
-      .top-ticker {
-        background: var(--ink);
-        color: var(--paper);
-        font-family: var(--font-mono);
-        font-size: 0.72rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-      .top-ticker-inner {
-        max-width: var(--max-w);
-        margin: 0 auto;
-        padding: 0.45rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-      }
-      .top-ticker a { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
       .site-header {
         position: sticky;
         top: 0;
@@ -310,7 +292,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
       }
       .header-nav {
         display: flex;
@@ -575,26 +557,13 @@
         .masthead { padding: 1rem 1rem 0.8rem; }
         .header-inner { padding: 0.5rem 1rem; }
         .header-meta .hide-sm { display: none; }
-        .top-ticker-inner { padding: 0.45rem 1rem; }
       }
     </style>
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <div class="top-ticker">
-      <div class="top-ticker-inner">
-        <span>Published via Nostr · NIP-23 long-form</span>
-        <span class="hide-sm">{% if author and author.npub %}<a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer">Verify on Nostr →</a>{% else %}Decentralized publishing{% endif %}</span>
-      </div>
-    </div>
-
     <header class="site-header" role="banner">
-      <div class="masthead">
-        <p class="masthead-kicker">An independent publication</p>
-        <a href="{{ pathPrefix }}" class="header-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
-        {% if site.description %}<p class="masthead-sub">{{ site.description | truncate(120) }}</p>{% endif %}
-      </div>
       <div class="header-inner">
         <nav class="header-nav" aria-label="Site navigation">
           <a href="{{ pathPrefix }}" class="header-nav-link active">Latest</a>
@@ -621,6 +590,11 @@
             <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
           </button>
         </div>
+      </div>
+      <div class="masthead">
+        <p class="masthead-kicker">An independent publication</p>
+        <a href="{{ pathPrefix }}" class="header-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
+        {% if site.description %}<p class="masthead-sub">{{ site.description | truncate(120) }}</p>{% endif %}
       </div>
     </header>
 
