@@ -1,4 +1,4 @@
-name: Deploy NostrPress to GitHub Pages
+name: Deploy
 
 on:
   push:
