@@ -281,8 +281,8 @@ async function run() {
   ✗ Error: Nostr public key (npub1...) or profile (nprofile1...) is required.
 
   Usage:
-    npx nostrpress <npub_or_nprofile> [options]
-    NPUB=npub1... npx nostrpress
+    npx github:besoeasy/NostrPress <npub_or_nprofile> [options]
+    NPUB=npub1... npx github:besoeasy/NostrPress
 
   Run \`nostrpress --help\` for full list of options.
 `);

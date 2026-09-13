@@ -1,11 +1,8 @@
 # NostrPress
 
-[![npm version](https://img.shields.io/npm/v/nostrpress.svg)](https://www.npmjs.com/package/nostrpress)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Turn your [Nostr](https://nostr.com) long-form posts ([NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md)) into a fast, standalone static blog. One command, no config.
-
-📦 **Available on npm:** [npmjs.com/package/nostrpress](https://www.npmjs.com/package/nostrpress)
 
 ---
 
@@ -36,18 +33,18 @@ Deploy your own live, auto-updating Nostr blog for free with one click:
 
 **Direct CLI Arguments (via npx)**
 ```bash
-npx nostrpress npub1...
-npx nostrpress npub1... --out ./public/blog --url https://myblog.com
+npx github:besoeasy/NostrPress npub1...
+npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
 ```
 
 **Environment Variables**
 ```bash
-NPUB=npub1... npx nostrpress
+NPUB=npub1... npx github:besoeasy/NostrPress
 ```
 
 **Bun**
 ```bash
-bunx nostrpress npub1...
+bunx github:besoeasy/NostrPress npub1...
 ```
 
 Output lands in `./blog/` (or your `--out` directory) — ready to serve.
@@ -64,7 +61,7 @@ The generated `./blog` folder is pure static HTML/CSS/JS. Output directly to you
 // package.json
 {
   "scripts": {
-    "blog:fetch": "npx nostrpress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
     "dev": "vite",
     "build": "npm run blog:fetch && vite build",
     "preview": "vite preview"
@@ -83,7 +80,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx nostrpress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
     "dev": "vite",
     "build": "npm run blog:fetch && vite build"
   }
@@ -95,7 +92,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx nostrpress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
     "start": "react-scripts start",
     "build": "npm run blog:fetch && react-scripts build"
   }
@@ -109,7 +106,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx nostrpress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
     "dev": "nuxt dev",
     "build": "npm run blog:fetch && nuxt build",
     "generate": "npm run blog:fetch && nuxt generate"
@@ -124,7 +121,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx nostrpress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
     "dev": "next dev",
     "build": "npm run blog:fetch && next build"
   }
@@ -136,7 +133,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ### Plain HTML / Static Hosting
 
 ```bash
-npx nostrpress npub1...
+npx github:besoeasy/NostrPress npub1...
 # serve ./blog with any static web server
 npx serve ./blog
 ```
@@ -206,7 +203,7 @@ blog/
 ### Example with Site URL & Custom Output
 
 ```bash
-npx nostrpress npub1... --out ./public/blog --url https://myblog.com
+npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
 ```
 
 This generates:

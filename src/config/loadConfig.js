@@ -42,10 +42,10 @@ export function printHelp() {
     -v, --version            Display version number
 
   Examples:
-    npx nostrpress npub1hznmntyj254kqhr079a5gt2wvhyll6rz6q67pyjres4lfkql22kq5ml6zh
-    npx nostrpress npub1... --out ./public/blog --url https://myblog.com
-    npx nostrpress npub1... -r wss://relay.primal.net -r wss://relay.snort.social
-    NPUB=npub1... npx nostrpress
+    npx github:besoeasy/NostrPress npub1hznmntyj254kqhr079a5gt2wvhyll6rz6q67pyjres4lfkql22kq5ml6zh
+    npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
+    npx github:besoeasy/NostrPress npub1... -r wss://relay.primal.net -r wss://relay.snort.social
+    NPUB=npub1... npx github:besoeasy/NostrPress
 `);
 }
 
