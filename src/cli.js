@@ -327,8 +327,15 @@ async function run() {
 
   // ── Step 5: Download media ─────────────────────────────────────────────────
   step("Processing media");
-  const mediaResult = await processMedia(withComments, config);
+  const mediaResult = await processMedia(withComments, config, profile);
   stepDone(`→ ${mediaResult.assets.length} asset${mediaResult.assets.length !== 1 ? "s" : ""}`);
+
+  if (profile.picture && mediaResult.urlMap.has(profile.picture)) {
+    profile.picture = mediaResult.urlMap.get(profile.picture);
+  }
+  if (profile.banner && mediaResult.urlMap.has(profile.banner)) {
+    profile.banner = mediaResult.urlMap.get(profile.banner);
+  }
 
   const rewritten = withComments.map((article) => rewriteArticleContent(article, mediaResult.urlMap));
 

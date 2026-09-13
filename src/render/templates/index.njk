@@ -4,7 +4,7 @@
 {% set pageDescription = site.description %}
 {% set canonicalUrl = pathPrefix %}
 {% set ogType = "website" %}
-{% set ogImage = articles[0].image if articles.length > 0 and articles[0].image else "" %}
+{% set ogImage = articles[0].image if articles.length > 0 and articles[0].image else (author.profile.banner if author and author.profile and author.profile.banner else "") %}
 
 {% block additionalHead %}
 <script type="application/ld+json">
@@ -52,42 +52,99 @@
     border-radius: var(--radius);
     box-shadow: 5px 5px 0 var(--border-strong);
     overflow: hidden;
-    display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
-  @media (max-width: 860px) { .cover { grid-template-columns: 1fr; } }
-  .cover-main { padding: 2.2rem 2.2rem 2rem; display: flex; flex-direction: column; justify-content: center; }
+  .cover:hover {
+    transform: translateY(-2px);
+    box-shadow: 7px 7px 0 var(--border-strong);
+  }
+  .cover-art {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: block;
+  }
+  .cover-art img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .cover:hover .cover-art img {
+    transform: scale(1.02);
+  }
+  .cover-art-fallback {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(3rem, 8vw, 6rem);
+    color: var(--border-strong);
+    background: repeating-linear-gradient(-45deg, transparent 0 14px, rgba(0,0,0,0.05) 14px 15px), var(--surface-alt);
+  }
+  .cover-main {
+    padding: clamp(1.4rem, 3.5vw, 2.2rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .cover-meta-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
   .kicker {
     display: inline-flex; align-items: center; gap: 0.5rem;
     font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--surface); background: var(--accent); padding: 0.3rem 0.7rem; border-radius: 100px;
-    margin-bottom: 1rem; width: fit-content;
+    width: fit-content;
   }
   .kicker.alt { background: var(--ink); color: var(--paper); }
   .cover-title {
-    font-family: var(--font-display); font-weight: 900; letter-spacing: -0.035em; line-height: 0.98;
-    font-size: clamp(2rem, 4.5vw, 3.4rem); margin-bottom: 1rem;
+    font-family: var(--font-display); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1;
+    font-size: clamp(1.8rem, 4vw, 2.75rem); margin-bottom: 0.85rem;
   }
   .cover-title a { color: inherit; text-decoration: none; }
   .cover-title a:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
-  .cover-dek { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--ink-muted); line-height: 1.55; margin-bottom: 1.25rem; }
-  .byline { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.4rem; }
-  .byline-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-strong); }
-  .byline-avatar-fallback { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-weight: 800; font-family: var(--font-display); }
+  .cover-dek {
+    font-family: var(--font-display); font-style: italic; font-size: clamp(1rem, 2vw, 1.18rem);
+    color: var(--ink-muted); line-height: 1.55; margin-bottom: 1.35rem;
+  }
+  .cover-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1.1rem;
+    border-top: 1px dashed var(--border);
+  }
+  .byline { display: flex; align-items: center; gap: 0.7rem; }
+  .byline-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-strong); }
+  .byline-avatar-fallback { width: 38px; height: 38px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-weight: 800; font-family: var(--font-display); }
   .byline-name { font-weight: 700; font-size: 0.9rem; }
   .byline-date { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-subtle); }
   .btn {
     display: inline-flex; align-items: center; gap: 0.5rem;
     background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; font-size: 0.9rem;
-    padding: 0.7rem 1.2rem; border-radius: 100px; border: 1px solid var(--ink); width: fit-content;
+    padding: 0.65rem 1.2rem; border-radius: 100px; border: 1px solid var(--ink); width: fit-content;
     transition: transform 0.15s, box-shadow 0.15s;
   }
   .btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--accent); }
-  .cover-art { background: var(--surface-alt); border-left: 1px solid var(--border); min-height: 320px; position: relative; overflow: hidden; }
-  @media (max-width: 860px) { .cover-art { border-left: none; border-top: 1px solid var(--border); min-height: 240px; } }
-  .cover-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .cover-art-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 900; font-size: 6rem; color: var(--border-strong); background: repeating-linear-gradient(-45deg, transparent 0 14px, rgba(0,0,0,0.05) 14px 15px), var(--surface-alt); }
 
   .section-bar {
     display: flex; align-items: center; gap: 0.9rem; margin: 1.8rem auto 1.1rem;
@@ -102,8 +159,9 @@
   .stories .post-list { grid-template-columns: 1fr; }
   .stories .post-link { flex-direction: row; align-items: stretch; }
   .stories .post-thumb-wrap {
-    width: 260px; min-width: 260px; aspect-ratio: auto; min-height: 100%;
+    width: 240px; min-width: 240px; aspect-ratio: 16 / 9;
     border-bottom: none; border-right: 1px solid var(--border);
+    flex-shrink: 0;
   }
   .stories .post-body { padding: 1.25rem 1.35rem; justify-content: center; }
   .stories .post-title { font-size: 1.35rem; }
@@ -121,30 +179,32 @@
   {% if articles.length > 0 %}
     {% set featured = articles[0] %}
     <article class="cover">
-      <div class="cover-main">
-        <span class="kicker">★ Cover story</span>
-        <h1 class="cover-title"><a href="{{ pathPrefix }}{{ featured.slug }}.html">{{ featured.title }}</a></h1>
-        {% if featured.summary %}<p class="cover-dek">{{ featured.summary }}</p>{% endif %}
-        <div class="byline">
-          {% if author.profile.picture %}
-            <img src="{{ author.profile.picture }}" alt="" class="byline-avatar" />
-          {% else %}
-            <div class="byline-avatar-fallback">{{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}</div>
-          {% endif %}
-          <div>
-            <div class="byline-name">{{ author.profile.display_name or author.profile.name or site.title }}</div>
-            <div class="byline-date"><time datetime="{{ featured.published_at | date('iso') }}">{{ featured.published_at | date("Y-m-d") }}</time>{% if featured.readingTime %} · {{ featured.readingTime }} min read{% endif %}</div>
-          </div>
-        </div>
-        <a class="btn" href="{{ pathPrefix }}{{ featured.slug }}.html">Read story →</a>
-      </div>
       <a class="cover-art" href="{{ pathPrefix }}{{ featured.slug }}.html" aria-label="{{ featured.title }}">
         {% if featured.image %}
-          <img src="{{ featured.image }}" alt="" loading="eager" />
+          <img src="{{ featured.image }}" alt="{{ featured.title }}" loading="eager" />
         {% else %}
           <div class="cover-art-fallback">{{ featured.title[0] | upper }}</div>
         {% endif %}
       </a>
+      <div class="cover-main">
+        <div class="cover-meta-top">
+          <span class="kicker">★ Cover story</span>
+          <div class="byline-date"><time datetime="{{ featured.published_at | date('iso') }}">{{ featured.published_at | date("Y-m-d") }}</time>{% if featured.readingTime %} · {{ featured.readingTime }} min read{% endif %}</div>
+        </div>
+        <h1 class="cover-title"><a href="{{ pathPrefix }}{{ featured.slug }}.html">{{ featured.title }}</a></h1>
+        {% if featured.summary %}<p class="cover-dek">{{ featured.summary }}</p>{% endif %}
+        <div class="cover-footer">
+          <div class="byline">
+            {% if author.profile.picture %}
+              <img src="{{ author.profile.picture }}" alt="" class="byline-avatar" />
+            {% else %}
+              <div class="byline-avatar-fallback">{{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}</div>
+            {% endif %}
+            <div class="byline-name">{{ author.profile.display_name or author.profile.name or site.title }}</div>
+          </div>
+          <a class="btn" href="{{ pathPrefix }}{{ featured.slug }}.html">Read story →</a>
+        </div>
+      </div>
     </article>
 
     <div class="stories">

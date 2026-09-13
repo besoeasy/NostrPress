@@ -175,7 +175,7 @@ function isLikelyMediaUrl(url) {
   }
 }
 
-export async function processMedia(articles, config) {
+export async function processMedia(articles, config, profile = null) {
   if (!config.media.download) {
     return { assets: [], urlMap: new Map() };
   }
@@ -189,6 +189,18 @@ export async function processMedia(articles, config) {
   fs.mkdirSync(PERSISTENT_CACHE_DIR, { recursive: true });
 
   const allUrls = new Set();
+
+  if (profile) {
+    if (profile.picture) {
+      const norm = normalizeUrl(profile.picture);
+      if (norm) allUrls.add(norm);
+    }
+    if (profile.banner) {
+      const norm = normalizeUrl(profile.banner);
+      if (norm) allUrls.add(norm);
+    }
+  }
+
   for (const article of articles) {
     // Explicit article media (always included)
     if (article.image) {

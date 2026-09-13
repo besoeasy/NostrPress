@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nostrpress
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./blog
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: NPUB
+        sync: false
+      - key: SITE_URL
+        sync: false

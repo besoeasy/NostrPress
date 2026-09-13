@@ -53,13 +53,13 @@
     "slugify": "^1.6.6",
     "tailwindcss": "^3.4.10",
     "ws": "^8.18.0",
-    "yaml": "^2.5.1"
+    "yaml": "^2.5.1",
+    "rimraf": "^5.0.7"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
     "nodemon": "^3.1.9",
     "postcss": "^8.4.38",
-    "rimraf": "^5.0.7",
     "serve": "^14.2.4"
   },
   "engines": {

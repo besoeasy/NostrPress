@@ -16,6 +16,22 @@
     padding: clamp(1.5rem, 4vw, 2.5rem);
     margin-bottom: 1.25rem;
   }
+  .author-banner-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+  }
+  .author-banner {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
   .author-page-header {
     display: flex;
     align-items: flex-start;
@@ -83,6 +99,11 @@
 
 {% block content %}
 <div class="author-sheet">
+  {% if author and author.profile and author.profile.banner %}
+    <div class="author-banner-wrap">
+      <img src="{{ author.profile.banner }}" alt="{{ author.profile.display_name or author.profile.name }}" class="author-banner" loading="eager" />
+    </div>
+  {% endif %}
   <header class="author-page-header">
     {% if author.profile.picture %}
       <img src="{{ author.profile.picture }}" alt="{{ author.profile.display_name or author.profile.name }}" class="author-page-avatar" />
