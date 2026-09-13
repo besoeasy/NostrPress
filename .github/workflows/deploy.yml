@@ -37,10 +37,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Compute GitHub Pages URL
+        id: pages-url
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"
+          OWNER="${REPO%/*}"
+          REPO_NAME="${REPO#*/}"
+          if [ "$REPO_NAME" = "${OWNER}.github.io" ]; then
+            # User/org site: https://<owner>.github.io/
+            URL="https://${OWNER}.github.io/"
+          else
+            # Project site: https://<owner>.github.io/<repo>/
+            URL="https://${OWNER}.github.io/${REPO_NAME}/"
+          fi
+          # Edge case: normalize http -> https
+          URL="${URL/http:\/\//https:\/\/}"
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
+
       - name: Build static blog
         env:
           NPUB: ${{ secrets.NPUB || vars.NPUB }}
-          SITE_URL: ${{ secrets.SITE_URL || vars.SITE_URL }}
+          SITE_URL: ${{ secrets.SITE_URL || vars.SITE_URL || steps.pages-url.outputs.url }}
         run: npm run build
 
       - name: Setup Pages

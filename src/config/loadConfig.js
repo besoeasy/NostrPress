@@ -94,7 +94,8 @@ export function loadConfig(argv = process.argv.slice(2)) {
   const npub = values.npub || positionalNpub || process.env.NPUB || "";
   const outDir = values.out || values.output || process.env.OUTPUT_DIR || defaultConfig.output_dir;
   const rawUrl = values.url || values["site-url"] || process.env.SITE_URL || "";
-  const siteUrl = rawUrl.replace(/\/$/, "");
+  // Edge case: normalize http:// -> https:// (GitHub Pages is always https)
+  const siteUrl = rawUrl.replace(/^http:\/\//i, "https://").replace(/\/$/, "");
 
   let relays = [...defaultConfig.relays];
   const customRelayList = [];
