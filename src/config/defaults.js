@@ -14,7 +14,7 @@ export const defaultConfig = {
     "wss://user.kindpag.es"
   ],
   trusted_only: true,
-  output_dir: "./blog",
+  output_dir: "dist",
   site: {
     title: "auto",
     description: "auto",

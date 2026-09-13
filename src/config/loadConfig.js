@@ -30,7 +30,6 @@ export function printHelp() {
 
   Options:
     -n, --npub <key>         Nostr public key (npub1...) or profile (nprofile1...)
-    -o, --out <dir>          Output directory (default: "./blog")
     -u, --url <url>          Base canonical URL for RSS & sitemap (e.g. "https://myblog.com")
         --site-url <url>     Alias for --url
     -r, --relay <relay>      Custom Nostr relay URL (can be specified multiple times)
@@ -43,7 +42,7 @@ export function printHelp() {
 
   Examples:
     npx github:besoeasy/NostrPress npub1hznmntyj254kqhr079a5gt2wvhyll6rz6q67pyjres4lfkql22kq5ml6zh
-    npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
+    npx github:besoeasy/NostrPress npub1... --url https://myblog.com
     npx github:besoeasy/NostrPress npub1... -r wss://relay.primal.net -r wss://relay.snort.social
     NPUB=npub1... npx github:besoeasy/NostrPress
 `);
@@ -58,8 +57,6 @@ export function loadConfig(argv = process.argv.slice(2)) {
       args: argv,
       options: {
         npub: { type: "string", short: "n" },
-        out: { type: "string", short: "o" },
-        output: { type: "string" },
         url: { type: "string", short: "u" },
         "site-url": { type: "string" },
         relay: { type: "string", short: "r", multiple: true },
@@ -92,7 +89,7 @@ export function loadConfig(argv = process.argv.slice(2)) {
 
   const positionalNpub = positionals.find((p) => p.startsWith("npub") || p.startsWith("nprofile")) || positionals[0];
   const npub = values.npub || positionalNpub || process.env.NPUB || "";
-  const outDir = values.out || values.output || process.env.OUTPUT_DIR || defaultConfig.output_dir;
+  const outDir = defaultConfig.output_dir;
   const rawUrl = values.url || values["site-url"] || process.env.SITE_URL || "";
   // Edge case: normalize http:// -> https:// (GitHub Pages is always https)
   const siteUrl = rawUrl.replace(/^http:\/\//i, "https://").replace(/\/$/, "");

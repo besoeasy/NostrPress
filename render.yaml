@@ -3,7 +3,7 @@ services:
     name: nostrpress
     runtime: static
     buildCommand: npm install && npm run build
-    staticPublishPath: ./blog
+    staticPublishPath: ./dist
     autoDeployTrigger: 'off'
     envVars:
       - key: NPUB

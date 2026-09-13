@@ -27,8 +27,8 @@
   "type": "module",
   "main": "src/cli.js",
   "scripts": {
-    "build": "rimraf blog && node src/cli.js",
-    "dev": "serve blog -p 3000"
+    "build": "rimraf dist && node src/cli.js",
+    "dev": "serve dist -p 3000"
   },
   "bin": {
     "nostrpress": "bin/nostrpress.js"

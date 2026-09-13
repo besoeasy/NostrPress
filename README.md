@@ -24,7 +24,7 @@ Deploy your own live, auto-updating Nostr blog for free with one click:
 
 1. You pass your `npub` or `nprofile`
 2. NostrPress fetches your articles, profile, and comments from Nostr relays
-3. It downloads media assets, caches them locally, and generates a static site into `./blog` (or custom `--out` directory)
+3. It downloads media assets, caches them locally, and generates a static site into `dist`
 4. Drop that folder anywhere — any host, any framework
 
 ---
@@ -34,7 +34,7 @@ Deploy your own live, auto-updating Nostr blog for free with one click:
 **Direct CLI Arguments (via npx)**
 ```bash
 npx github:besoeasy/NostrPress npub1...
-npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
+npx github:besoeasy/NostrPress npub1... --url https://myblog.com
 ```
 
 **Environment Variables**
@@ -47,13 +47,13 @@ NPUB=npub1... npx github:besoeasy/NostrPress
 bunx github:besoeasy/NostrPress npub1...
 ```
 
-Output lands in `./blog/` (or your `--out` directory) — ready to serve.
+Output lands in `dist/` — ready to serve.
 
 ---
 
 ## Use with any framework
 
-The generated `./blog` folder is pure static HTML/CSS/JS. Output directly to your framework's public directory with `--out` (or copy it):
+The generated `dist` folder is pure static HTML/CSS/JS. Copy it into your framework's public directory:
 
 ### Vue (Vite)
 
@@ -61,7 +61,7 @@ The generated `./blog` folder is pure static HTML/CSS/JS. Output directly to you
 // package.json
 {
   "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
     "dev": "vite",
     "build": "npm run blog:fetch && vite build",
     "preview": "vite preview"
@@ -80,7 +80,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
     "dev": "vite",
     "build": "npm run blog:fetch && vite build"
   }
@@ -92,7 +92,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
     "start": "react-scripts start",
     "build": "npm run blog:fetch && react-scripts build"
   }
@@ -106,7 +106,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
     "dev": "nuxt dev",
     "build": "npm run blog:fetch && nuxt build",
     "generate": "npm run blog:fetch && nuxt generate"
@@ -121,7 +121,7 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 ```json
 {
   "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... --out ./public/blog",
+    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
     "dev": "next dev",
     "build": "npm run blog:fetch && next build"
   }
@@ -134,8 +134,8 @@ Blog lives at `/blog/` alongside your Vue app. No vite config changes needed —
 
 ```bash
 npx github:besoeasy/NostrPress npub1...
-# serve ./blog with any static web server
-npx serve ./blog
+# serve dist with any static web server
+npx serve dist
 ```
 
 ---
@@ -156,7 +156,7 @@ NostrPress includes a pre-configured GitHub Actions workflow ([`.github/workflow
 ## What you get
 
 ```
-blog/
+dist/
 ├── index.html          ← homepage with profile & post index
 ├── your-post-slug.html ← individual article pages
 ├── tags/
@@ -180,7 +180,6 @@ blog/
 |------|-------------|---------|
 | `<npub_or_nprofile>` | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) | Positional |
 | `-n, --npub <key>` | Explicit flag for `npub` or `nprofile` | `$NPUB` |
-| `-o, --out <dir>` | Output folder for static blog | `./blog` |
 | `-u, --url <url>` | Canonical site URL (enables RSS feed, sitemap & SEO tags) | `$SITE_URL` |
 | `-r, --relay <relay>` | Custom relay URL (can be specified multiple times) | Default relays + NIP-65 |
 | `-c, --clean` | Clear local cache before building | `false` |
@@ -196,20 +195,19 @@ blog/
 |----------|----------|-------------|
 | `NPUB` | ✅ yes (or pass as CLI arg) | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) |
 | `SITE_URL` | optional | Canonical base URL (e.g. `https://myblog.com`). Enables RSS (`/feed.xml`), sitemap (`/sitemap.xml`), and canonical link tags. |
-| `OUTPUT_DIR` | optional | Output destination (default: `./blog`) |
 | `RELAYS` | optional | Comma-separated list of custom relays |
 | `CLEAN` | optional | Set to `true` to clear cache before build |
 
-### Example with Site URL & Custom Output
+### Example with Site URL
 
 ```bash
-npx github:besoeasy/NostrPress npub1... --out ./public/blog --url https://myblog.com
+npx github:besoeasy/NostrPress npub1... --url https://myblog.com
 ```
 
 This generates:
 
 ```
-public/blog/
+dist/
 ├── index.html     ← homepage with all posts & profile
 ├── feed.xml       ← RSS 2.0 feed (latest 20 posts)
 ├── sitemap.xml    ← XML sitemap (all pages + tag pages)
