@@ -44,7 +44,17 @@ jobs:
           REPO="${{ github.repository }}"
           OWNER="${REPO%/*}"
           REPO_NAME="${REPO#*/}"
-          if [ "$REPO_NAME" = "${OWNER}.github.io" ]; then
+          # Query the Pages API for the custom domain (cname) set in Pages settings
+          PAGES_JSON="$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${REPO}/pages")"
+          CNAME="$(echo "$PAGES_JSON" | jq -r '.cname // empty')"
+          HTML_URL="$(echo "$PAGES_JSON" | jq -r '.html_url // empty')"
+          if [ -n "$CNAME" ]; then
+            # Custom domain set in Pages settings
+            URL="https://${CNAME}/"
+          elif [ -n "$HTML_URL" ]; then
+            URL="$HTML_URL"
+          elif [ "$REPO_NAME" = "${OWNER}.github.io" ]; then
             # User/org site: https://<owner>.github.io/
             URL="https://${OWNER}.github.io/"
           else
