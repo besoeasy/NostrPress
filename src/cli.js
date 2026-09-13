@@ -88,6 +88,28 @@ function sortArticles(articles) {
   });
 }
 
+// NIP-23 events can be republished/edited, producing multiple events with the
+// same `d` tag (slug). Keep a single version per slug, preferring the one with
+// a cover image, then the newest.
+function dedupeArticles(articles) {
+  const bySlug = new Map();
+  for (const article of articles) {
+    const existing = bySlug.get(article.slug);
+    if (!existing) {
+      bySlug.set(article.slug, article);
+      continue;
+    }
+    const existingHasImage = Boolean(existing.image);
+    const newHasImage = Boolean(article.image);
+    if (newHasImage && !existingHasImage) {
+      bySlug.set(article.slug, article);
+    } else if (newHasImage === existingHasImage && article.published_at > existing.published_at) {
+      bySlug.set(article.slug, article);
+    }
+  }
+  return [...bySlug.values()];
+}
+
 function buildContext(config, npub, pubkey, profile, articles) {
   const siteTitle = config.site.title === "auto" ? profile.display_name || profile.name || npub : config.site.title;
   const siteDescription = config.site.description === "auto" ? profile.about || `Posts by ${siteTitle}` : config.site.description;
@@ -303,7 +325,8 @@ async function run() {
   step("Fetching articles");
   const events = await fetchArticles(pool, activeRelays, config, identity.pubkey);
   const parsed = events.map(parseArticle);
-  const sorted = sortArticles(parsed);
+  const deduped = dedupeArticles(parsed);
+  const sorted = sortArticles(deduped);
   const withSummary = sorted.map((article) => ({
     ...article,
     summary: normalizeSummary(article.content, article.summary),
