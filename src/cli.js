@@ -50,6 +50,7 @@ function printSummary(stats) {
     console.log(`  ✓ Downloaded ${stats.assets} media asset${stats.assets !== 1 ? "s" : ""}`);
   }
   if (stats.rss) console.log(`  ✓ RSS feed  → ${stats.rss}`);
+  if (stats.jsonFeed) console.log(`  ✓ JSON feed → ${stats.jsonFeed}`);
   if (stats.sitemap) console.log(`  ✓ Sitemap   → ${stats.sitemap}`);
   console.log(`  ✓ Output    → ${stats.outputDir}`);
   console.log(`  ✓ Done in ${elapsed}s`);
@@ -228,6 +229,47 @@ ${items}
   return feedPath;
 }
 
+function generateJsonFeed(context, outputDir) {
+  const siteUrl = context.site.url;
+  if (!siteUrl) return null;
+
+  const { title, description } = context.site;
+  const author = context.author.profile;
+  const authorName = author.display_name || author.name || title;
+  const articles = context.articles.slice(0, 10); // JSON Feed: latest 10
+
+  const items = articles.map((article) => {
+    const articleUrl = `${siteUrl}/${article.slug}.html`;
+    const item = {
+      id: articleUrl,
+      url: articleUrl,
+      title: article.title,
+      date_published: new Date(article.published_at).toISOString(),
+    };
+    if (article.summary) item.summary = article.summary;
+    // `html` is the sanitized rendered markdown (set before renderSite).
+    if (article.html) item.content_html = article.html;
+    else if (article.content) item.content_text = article.content;
+    if (article.tags?.length) item.tags = article.tags;
+    if (article.image) item.image = article.image;
+    return item;
+  });
+
+  const feed = {
+    version: "https://jsonfeed.org/version/1.1",
+    title,
+    home_page_url: `${siteUrl}/`,
+    feed_url: `${siteUrl}/feed.json`,
+    description,
+    authors: [{ name: authorName }],
+    items,
+  };
+
+  const feedPath = path.join(outputDir, "feed.json");
+  fs.writeFileSync(feedPath, JSON.stringify(feed, null, 2), "utf-8");
+  return feedPath;
+}
+
 // ── Sitemap Generation ────────────────────────────────────────────────────────
 
 function generateSitemap(context, outputDir) {
@@ -377,15 +419,17 @@ async function run() {
   writeStaticAssets(config.output_dir, packageRoot);
   runTailwind(config.output_dir, packageRoot);
 
-  // ── Step 8: RSS + Sitemap (only when SITE_URL is set) ─────────────────────
+  // ── Step 8: RSS + JSON Feed + Sitemap (only when SITE_URL is set) ─────────
   let rssPath = null;
+  let jsonFeedPath = null;
   let sitemapPath = null;
 
   if (hasSiteUrl) {
-    step("Generating RSS feed & sitemap");
+    step("Generating RSS + JSON feeds & sitemap");
     rssPath = generateRss(context, config.output_dir);
+    jsonFeedPath = generateJsonFeed(context, config.output_dir);
     sitemapPath = generateSitemap(context, config.output_dir);
-    stepDone(`→ feed.xml + sitemap.xml`);
+    stepDone(`→ feed.xml + feed.json + sitemap.xml`);
   }
 
   // ── Summary ────────────────────────────────────────────────────────────────
@@ -393,6 +437,7 @@ async function run() {
     articles: rendered.length,
     assets: mediaResult.assets.length,
     rss: rssPath ? path.join(config.output_dir, "feed.xml") : null,
+    jsonFeed: jsonFeedPath ? path.join(config.output_dir, "feed.json") : null,
     sitemap: sitemapPath ? path.join(config.output_dir, "sitemap.xml") : null,
     outputDir: path.resolve(config.output_dir),
   });

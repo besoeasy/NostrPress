@@ -14,6 +14,7 @@
     {% endif %}
     {% if site.url %}
     <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS Feed" href="{{ site.url }}/feed.xml" />
+    <link rel="alternate" type="application/feed+json" title="{{ site.title }} JSON Feed" href="{{ site.url }}/feed.json" />
     {% endif %}
 
     <!-- Favicon and Icons -->
@@ -614,6 +615,7 @@
           <ul class="footer-links">
             <li><a href="{{ pathPrefix }}">Latest stories</a></li>
             {% if site.url %}<li><a href="{{ site.url }}/feed.xml">RSS feed</a></li>
+            <li><a href="{{ site.url }}/feed.json">JSON feed</a></li>
             <li><a href="{{ site.url }}/sitemap.xml">Sitemap</a></li>{% endif %}
             {% if author.profile.website %}<li><a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer">Author website</a></li>{% endif %}
           </ul>
