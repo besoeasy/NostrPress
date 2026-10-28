@@ -110,6 +110,13 @@ export function createRenderer(templateDir) {
   // Take the first `n` items of an array (Nunjucks' built-in `slice` splits
   // into groups, so `| slice(0, n)` silently yields nothing).
   env.addFilter("take", (arr, n) => (Array.isArray(arr) ? arr.slice(0, n) : []));
+  // Prefix locally-downloaded asset paths with the page-depth prefix so they
+  // resolve from nested pages too (tag pages live at tags/<slug>/).
+  env.addFilter("depth", (url, prefix) => {
+    if (!url) return url;
+    if (/^(https?:)?\/\//i.test(url) || url.startsWith("/")) return url;
+    return prefix + url;
+  });
   return env;
 }
 

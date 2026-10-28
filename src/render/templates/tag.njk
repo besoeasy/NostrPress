@@ -83,7 +83,7 @@
       <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
         <span class="post-thumb-wrap">
           {% if article.image %}
-            <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" />
+            <img src="{{ article.image | depth(pathPrefix) }}" alt="" class="post-thumb" loading="lazy" />
           {% else %}
             <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
           {% endif %}
