@@ -241,29 +241,67 @@
       .skip-link:focus { top: 0; }
 
       /* ── Masthead / Header ─────────────────────────── */
-      .site-header {
+      /* Dark utility bar — the only part that stays sticky */
+      .topbar {
         position: sticky;
         top: 0;
         z-index: 100;
-        background: color-mix(in srgb, var(--paper) 92%, transparent);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-bottom: 3px double var(--border-strong);
+        background: var(--ink);
+        color: var(--paper);
+        padding: 0.6rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 1px 0 rgba(255,255,255,0.14);
       }
+      /* Masthead scrolls away with the page */
+      .site-header { background: var(--paper); }
       .masthead {
         max-width: var(--max-w);
         margin: 0 auto;
-        padding: 1.4rem 1.5rem 1.1rem;
+        padding: 1.5rem 1.5rem 1.6rem;
         text-align: center;
+        position: relative;
+        border-bottom: 3px solid var(--border-strong);
       }
-      .masthead-kicker {
+      /* Classic thin rule floating just below the thick one */
+      .masthead::after {
+        content: '';
+        position: absolute;
+        bottom: -7px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--border-strong);
+      }
+      /* Dateline row: publication note against story count */
+      .masthead-topline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
         font-family: var(--font-mono);
-        font-size: 0.72rem;
-        letter-spacing: 0.22em;
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+        color: var(--ink-subtle);
+        margin-bottom: 1.35rem;
+        white-space: nowrap;
+      }
+      .masthead-topline .masthead-rule {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        min-width: 1.5rem;
+      }
+      .masthead-sub {
+        margin: 0.55rem auto 0;
+        max-width: 62ch;
+        font-size: 0.85rem;
+        color: var(--ink-muted);
+        font-style: italic;
+        font-family: var(--font-display);
       }
       .header-brand {
         display: inline-block;
@@ -274,27 +312,14 @@
         font-size: clamp(2.2rem, 5vw, 3.6rem);
         letter-spacing: -0.03em;
         line-height: 0.95;
-        transition: opacity 0.15s;
       }
-      .header-brand:hover { opacity: 0.82; }
+      .header-brand:hover {
+        text-decoration: underline;
+        text-decoration-thickness: 4px;
+        text-decoration-color: var(--accent);
+        text-underline-offset: 10px;
+      }
       .header-brand .brand-dot { color: var(--accent); }
-      .masthead-sub {
-        margin-top: 0.6rem;
-        font-size: 0.85rem;
-        color: var(--ink-muted);
-        font-style: italic;
-        font-family: var(--font-display);
-      }
-      .header-inner {
-        background: var(--ink);
-        color: var(--paper);
-        padding: 0.6rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        border-bottom: 1px solid rgba(255,255,255,0.14);
-      }
       .header-nav {
         display: flex;
         align-items: center;
@@ -555,8 +580,8 @@
 
       @media (max-width: 640px) {
         .site-main { padding: 1.5rem 1rem 3rem; }
-        .masthead { padding: 1rem 1rem 0.8rem; }
-        .header-inner { padding: 0.5rem 1rem; }
+        .masthead { padding: 1.1rem 1rem 1.2rem; }
+        .topbar { padding: 0.5rem 1rem; }
         .header-meta .hide-sm { display: none; }
       }
     </style>
@@ -564,36 +589,41 @@
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <header class="site-header" role="banner">
-      <div class="header-inner">
-        <nav class="header-nav" aria-label="Site navigation">
-          <a href="{{ pathPrefix }}" class="header-nav-link active">Latest</a>
-          {% if author.profile.website %}
-          <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="header-nav-link">Website</a>
-          {% endif %}
-          {% if author.npub %}
-          <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="header-nav-link">Nostr</a>
-          {% endif %}
-          {% if site.url %}
-          <a href="{{ site.url }}/feed.xml" target="_blank" rel="noopener noreferrer" class="header-nav-link">RSS</a>
-          {% endif %}
-        </nav>
-        <div class="header-meta">
-          <span class="hide-sm">{{ articles.length if articles else '' }}{% if articles %} stories{% endif %}</span>
-          <button
-            class="theme-toggle"
-            id="theme-toggle"
-            type="button"
-            aria-label="Toggle dark mode"
-            title="Toggle dark mode"
-          >
-            <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-          </button>
-        </div>
+    <div class="topbar" role="banner">
+      <nav class="header-nav" aria-label="Site navigation">
+        <a href="{{ pathPrefix }}" class="header-nav-link active">Latest</a>
+        {% if author.profile.website %}
+        <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="header-nav-link">Website</a>
+        {% endif %}
+        {% if author.npub %}
+        <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="header-nav-link">Nostr</a>
+        {% endif %}
+        {% if site.url %}
+        <a href="{{ site.url }}/feed.xml" target="_blank" rel="noopener noreferrer" class="header-nav-link">RSS</a>
+        {% endif %}
+      </nav>
+      <div class="header-meta">
+        <span class="hide-sm">{{ articles.length if articles else '' }}{% if articles %} stories{% endif %}</span>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
+        >
+          <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
       </div>
+    </div>
+
+    <header class="site-header" role="banner">
       <div class="masthead">
-        <p class="masthead-kicker">An independent publication</p>
+        <div class="masthead-topline">
+          <span>An independent publication</span>
+          <span class="masthead-rule" aria-hidden="true"></span>
+          {% if articles %}<span>Nº {{ articles.length }} stories</span>{% endif %}
+        </div>
         <a href="{{ pathPrefix }}" class="header-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
         {% if site.description %}<p class="masthead-sub">{{ site.description | truncate(120) }}</p>{% endif %}
       </div>
