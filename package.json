@@ -28,7 +28,8 @@
   "main": "src/cli.js",
   "scripts": {
     "build": "rimraf dist && node src/cli.js",
-    "dev": "serve dist -p 3000"
+    "watch": "nodemon --watch src -e js,njk,css --exec \"node src/cli.js\"",
+    "dev": "concurrently -n build,serve \"npm:watch\" \"serve dist -p 3000\""
   },
   "bin": {
     "nostrpress": "bin/nostrpress.js"
