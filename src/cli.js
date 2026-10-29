@@ -464,6 +464,12 @@ async function run() {
   } catch (err) {
     stepDone("→ skipped");
     console.warn(`  ⚠ Audio narration skipped — ${err.message}`);
+    // Keep the build green, but annotate the Actions run so a missing ffmpeg or
+    // model download failure can't hide behind a successful deploy.
+    if (process.env.GITHUB_ACTIONS === "true") {
+      const detail = String(err.message).replace(/\r?\n/g, " ");
+      console.log(`::warning title=Audio narration skipped::${detail}`);
+    }
   }
 
   // ── Step 7: Render HTML ────────────────────────────────────────────────────
