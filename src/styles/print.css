@@ -220,6 +220,11 @@
     display: none !important;
   }
 
+  /* Audio players don't make sense on paper */
+  .article-audio {
+    display: none !important;
+  }
+
   /* Remove hover/interactive states */
   a:hover,
   .hover\:text-blue-600,

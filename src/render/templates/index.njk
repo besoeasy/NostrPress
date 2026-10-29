@@ -83,6 +83,17 @@
     font-size: 0.9rem;
     flex-wrap: wrap;
   }
+  .hero-audio {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .hero-audio:hover { text-decoration: underline; }
+  .hero-audio svg { width: 13px; height: 13px; }
   .hero-avatar {
     width: 36px;
     height: 36px;
@@ -225,6 +236,13 @@
       <span><b>{{ author.profile.display_name or author.profile.name or site.title }}</b></span>
       <span class="hero-byline-sep">·</span>
       <span>{{ articles.length }} stories · Censorship-resistant publishing</span>
+      {% if audio and audio.wholeBlog %}
+      <span class="hero-byline-sep">·</span>
+      <a class="hero-audio" href="{{ pathPrefix }}audio/whole-blog.mp3">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>
+        Listen to the blog · {{ audio.wholeBlog.minutes }} min
+      </a>
+      {% endif %}
     </div>
   </section>
 

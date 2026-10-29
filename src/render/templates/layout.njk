@@ -542,6 +542,7 @@
           <p class="footer-h">Explore</p>
           <ul class="footer-links">
             <li><a href="{{ pathPrefix }}">Latest stories</a></li>
+            {% if audio and audio.wholeBlog %}<li><a href="{{ pathPrefix }}audio/whole-blog.mp3">Listen to whole blog ({{ audio.wholeBlog.minutes }} min)</a></li>{% endif %}
             {% if site.url %}<li><a href="{{ site.url }}/feed.xml">RSS feed</a></li>
             <li><a href="{{ site.url }}/feed.json">JSON feed</a></li>
             <li><a href="{{ site.url }}/sitemap.xml">Sitemap</a></li>{% endif %}

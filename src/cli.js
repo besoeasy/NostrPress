@@ -17,6 +17,7 @@ import { parseArticle } from "./parser/articleParser.js";
 import { processMedia, rewriteArticleContent, clearMediaCache } from "./media/mediaPipeline.js";
 import { renderMarkdown, renderSite, calculateReadingTime } from "./render/render.js";
 import { generateSocialCards } from "./render/ogImages.js";
+import { generateAudio } from "./render/audio.js";
 import { normalizeTag } from "./utils/slugify.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -53,6 +54,9 @@ function printSummary(stats) {
   if (stats.rss) console.log(`  ✓ RSS feed  → ${stats.rss}`);
   if (stats.jsonFeed) console.log(`  ✓ JSON feed → ${stats.jsonFeed}`);
   if (stats.sitemap) console.log(`  ✓ Sitemap   → ${stats.sitemap}`);
+  if (stats.audio) {
+    console.log(`  ✓ Narration → audio/${stats.audio.items[0]?.slug || ""}.mp3 + audio/whole-blog.mp3 (${stats.audio.wholeBlog?.minutes} min)`);
+  }
   console.log(`  ✓ Output    → ${stats.outputDir}`);
   console.log(`  ✓ Done in ${elapsed}s`);
   console.log();
@@ -359,8 +363,8 @@ async function run() {
   }
 
   const hasSiteUrl = Boolean(config.site.url);
-  // Steps: identity, profile, articles, comments, media, render+cards, assets+css, rss+sitemap (optional)
-  const numSteps = (hasSiteUrl ? 8 : 7) + 1;
+  // Steps: identity, profile, articles, comments, media, audio, render+cards, assets+css, rss+sitemap (optional)
+  const numSteps = (hasSiteUrl ? 8 : 7) + 2;
   initProgress(numSteps);
 
   console.log("\n  NostrPress — building your Nostr blog\n");
@@ -422,7 +426,25 @@ async function run() {
 
   const rewritten = withComments.map((article) => rewriteArticleContent(article, mediaResult.urlMap));
 
-  // ── Step 6: Render HTML ────────────────────────────────────────────────────
+  // ── Step 6: Audio narration ─────────────────────────────────────────────────
+  // Generated before rendering so pages can embed players and durations.
+  // Failure must not break the build — pages simply render without audio.
+  step("Generating audio narration");
+  let audioResult = null;
+  try {
+    audioResult = await generateAudio({
+      context: buildContext(config, identity.npub, identity.pubkey, profile, rewritten),
+      outputDir: config.output_dir,
+      cacheDir: path.resolve(process.cwd(), "nostr-cache"),
+    });
+    // generateAudio mutates article.audioMinutes on the shared article objects.
+    stepDone(`→ ${audioResult.count} story MP3${audioResult.count !== 1 ? "s" : ""} + whole-blog (${audioResult.wholeBlog?.minutes || "?"} min)`);
+  } catch (err) {
+    stepDone("→ skipped");
+    console.warn(`  ⚠ Audio narration skipped — ${err.message}`);
+  }
+
+  // ── Step 7: Render HTML ────────────────────────────────────────────────────
   step("Rendering site");
   const rendered = rewritten.map((article) => ({
     ...article,
@@ -430,6 +452,9 @@ async function run() {
     html: renderMarkdown(article),
   }));
   const context = buildContext(config, identity.npub, identity.pubkey, profile, rendered);
+  if (audioResult && audioResult.wholeBlog) {
+    context.audio = { wholeBlog: audioResult.wholeBlog };
+  }
 
   // Social cards are generated from titles + metadata and referenced by every
   // page's og:image/twitter:image — failure must not break the build.
@@ -473,6 +498,7 @@ async function run() {
   printSummary({
     articles: rendered.length,
     assets: mediaResult.assets.length,
+    audio: audioResult,
     rss: rssPath ? path.join(config.output_dir, "feed.xml") : null,
     jsonFeed: jsonFeedPath ? path.join(config.output_dir, "feed.json") : null,
     sitemap: sitemapPath ? path.join(config.output_dir, "sitemap.xml") : null,
