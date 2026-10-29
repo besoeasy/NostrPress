@@ -5,6 +5,9 @@
 {% set canonicalUrl = pathPrefix ~ "tags/" ~ (tagSlug or tag) ~ "/" %}
 {% set ogType = "website" %}
 {% set ogImage = "" %}
+{% if socialCards %}
+  {% set ogImage = ogBase ~ "og.png" %}
+{% endif %}
 
 {% block additionalHead %}
 <style>

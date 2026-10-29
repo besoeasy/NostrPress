@@ -15,7 +15,8 @@ import { loadConfig } from "./config/loadConfig.js";
 import { resolveIdentity, fetchUserRelays, fetchProfileMetadata, fetchArticles, fetchComments, clearClientCache } from "./nostr/client.js";
 import { parseArticle } from "./parser/articleParser.js";
 import { processMedia, rewriteArticleContent, clearMediaCache } from "./media/mediaPipeline.js";
-import { renderMarkdown, renderSite } from "./render/render.js";
+import { renderMarkdown, renderSite, calculateReadingTime } from "./render/render.js";
+import { generateSocialCards } from "./render/ogImages.js";
 import { normalizeTag } from "./utils/slugify.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -358,8 +359,8 @@ async function run() {
   }
 
   const hasSiteUrl = Boolean(config.site.url);
-  // Steps: identity, profile, articles, comments, media, render, assets+css, rss+sitemap (optional)
-  const numSteps = hasSiteUrl ? 8 : 7;
+  // Steps: identity, profile, articles, comments, media, render+cards, assets+css, rss+sitemap (optional)
+  const numSteps = (hasSiteUrl ? 8 : 7) + 1;
   initProgress(numSteps);
 
   console.log("\n  NostrPress — building your Nostr blog\n");
@@ -425,10 +426,29 @@ async function run() {
   step("Rendering site");
   const rendered = rewritten.map((article) => ({
     ...article,
+    readingTime: calculateReadingTime(article.content),
     html: renderMarkdown(article),
   }));
   const context = buildContext(config, identity.npub, identity.pubkey, profile, rendered);
-  renderSite(context, config.output_dir);
+
+  // Social cards are generated from titles + metadata and referenced by every
+  // page's og:image/twitter:image — failure must not break the build.
+  step("Generating social cards");
+  let socialCardsEnabled = false;
+  try {
+    const cards = await generateSocialCards({
+      context,
+      outputDir: config.output_dir,
+      cacheDir: path.resolve(process.cwd(), "nostr-cache", "fonts"),
+    });
+    socialCardsEnabled = cards.socialCards;
+    stepDone(`→ ${cards.count} social card${cards.count !== 1 ? "s" : ""}`);
+  } catch (err) {
+    stepDone("→ skipped");
+    console.warn(`  ⚠ Social cards skipped — ${err.message}`);
+  }
+
+  renderSite(context, config.output_dir, { socialCards: socialCardsEnabled });
   stepDone(`→ ${rendered.length} page${rendered.length !== 1 ? "s" : ""}`);
 
   // ── Step 7: Static assets + CSS ───────────────────────────────────────────

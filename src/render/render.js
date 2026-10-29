@@ -120,10 +120,14 @@ export function createRenderer(templateDir) {
   return env;
 }
 
-export function renderSite(context, outputDir) {
+export function renderSite(context, outputDir, { socialCards = false } = {}) {
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
   const templatesDir = path.join(packageRoot, "src/render/templates");
   const env = createRenderer(templatesDir);
+
+  // og:image paths resolve against SITE_URL when set, else the page-depth prefix
+  const siteBase = context.site.url ? `${context.site.url.replace(/\/+$/, "")}/` : null;
+  const ogBaseFor = (prefix) => siteBase || prefix;
 
   const articlesSorted = [...context.articles].sort((a, b) => b.published_at - a.published_at);
 
@@ -134,7 +138,7 @@ export function renderSite(context, outputDir) {
     article.wordCount = article.content.trim().split(/\s+/).length;
   }
 
-  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted, pathPrefix: "./" });
+  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted, pathPrefix: "./", ogBase: ogBaseFor("./"), socialCards });
   writeFile(path.join(outputDir, "index.html"), indexHtml);
 
   const tagMap = new Map();
@@ -158,12 +162,12 @@ export function renderSite(context, outputDir) {
 
   for (const article of articlesSorted) {
     const relatedArticles = findRelatedArticles(article, articlesSorted);
-    const articleHtml = env.render("article.njk", { ...context, article, relatedArticles, pathPrefix: "./" });
+    const articleHtml = env.render("article.njk", { ...context, article, relatedArticles, pathPrefix: "./", ogBase: ogBaseFor("./"), socialCards });
     writeFile(path.join(outputDir, `${article.slug}.html`), articleHtml);
   }
 
   for (const { name, slug, articles } of tagMap.values()) {
-    const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles, pathPrefix: "../../" });
+    const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles, pathPrefix: "../../", ogBase: ogBaseFor("../../"), socialCards });
     writeFile(path.join(outputDir, "tags", slug, "index.html"), tagHtml);
   }
 }

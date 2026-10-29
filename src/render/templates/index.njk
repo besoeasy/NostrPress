@@ -5,6 +5,9 @@
 {% set canonicalUrl = pathPrefix %}
 {% set ogType = "website" %}
 {% set ogImage = articles[0].image if articles.length > 0 and articles[0].image else (author.profile.banner if author and author.profile and author.profile.banner else "") %}
+{% if socialCards %}
+  {% set ogImage = ogBase ~ "og.png" %}
+{% endif %}
 
 {% block additionalHead %}
 <script type="application/ld+json">

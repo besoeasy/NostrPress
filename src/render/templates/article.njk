@@ -5,6 +5,9 @@
 {% set canonicalUrl = pathPrefix ~ article.slug ~ ".html" %}
 {% set ogType = "article" %}
 {% set ogImage = article.image or "" %}
+{% if socialCards %}
+  {% set ogImage = ogBase ~ "og/" ~ article.slug ~ ".png" %}
+{% endif %}
 
 {% block additionalHead %}
 <script type="application/ld+json">
