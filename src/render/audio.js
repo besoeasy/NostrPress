@@ -53,10 +53,120 @@ function ensureEngine(cacheDir) {
 // ── Speech script ─────────────────────────────────────────────────────────────
 
 const FOLDS = { "‘": "'", "’": "'", "“": '"', "”": '"', "–": "-", "—": "-", "…": "..." };
+const TABLE_ROW_CAP = 10;
+
+// Listener-friendly units for table cells: "~15s" → "about 15 seconds",
+// "350MB" → "350 megabytes", "90%" → "90 percent", "$5" → "5 dollars".
+function phrasedUnits(cell) {
+  let t = cell.trim();
+  t = t.replace(/^~/, "about ");
+  t = t.replace(/\$(\d+(?:\.\d+)?)/g, "$1 dollars");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?TB\b/gi, "$1 terabytes");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?GB\b/gi, "$1 gigabytes");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?MB\b/gi, "$1 megabytes");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?KB\b/gi, "$1 kilobytes");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?ms\b/gi, "$1 milliseconds");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?s\b/gi, "$1 seconds");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?%/g, "$1 percent");
+  t = t.replace(/(\d+(?:\.\d+)?)\s?x\b/gi, "$1 times");
+  return t.replace(/\s+/g, " ").trim();
+}
+
+function joinWith(parts) {
+  if (parts.length <= 1) return parts.join("");
+  return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+}
+
+// Fenced code → a spoken marker, optionally anchored by its first comment
+// line ("described as…"); raw code is never dumped into the voice.
+function codeBlockToSpeech(code) {
+  const line = String(code)
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l && (/^\/\//.test(l) || /^#\s/.test(l) || /^\/\*/.test(l)));
+  if (!line) return " A code block follows. ";
+  return ` A code block follows, described as: ${line.replace(/^\/\/|#+\s*|\/\*|\*\//g, "").trim()}. `;
+}
+
+function isSeparatorRow(cells) {
+  return cells.every((c) => /^:?-{1,}:?$/.test(c) || c.trim() === "");
+}
+
+// Comparison tables can't be seen by a person listening, so the row-and-column
+// structure is re-spoken as sentences: header names spoken once, then each
+// row as `Label: Column, value. Column, value.`
+function renderPipeTable(lines) {
+  const rows = lines
+    .map((line) =>
+      line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((c) => phrasedUnits(c))
+    )
+    .filter((cells) => cells.length && cells.some((c) => c));
+
+  if (!rows.length) return "";
+  const sepIndex = rows.findIndex(isSeparatorRow);
+  let header = null;
+  let dataRows = rows;
+  if (sepIndex > 0) {
+    header = rows[sepIndex - 1];
+    dataRows = rows.filter((_, i) => i !== sepIndex - 1 && i !== sepIndex);
+  } else if (sepIndex === 0) {
+    dataRows = rows.filter((_, i) => i !== 0);
+  }
+
+  // Degenerate tables (single column, no header) read as a plain list.
+  if (!header || header.length < 2 || !dataRows.length) {
+    const items = rows.flat().filter((c) => c && !isSeparatorRow([c])).slice(0, 24);
+    if (!items.length) return "";
+    return ` A list: ${items.join(". ")}. `;
+  }
+
+  const valueCols = header.slice(1);
+  const capped = dataRows.slice(0, TABLE_ROW_CAP);
+  let speech = ` A data table with ${header.length} columns: ${joinWith(header)}. `;
+  capped.forEach((row) => {
+    const label = row[0] || "Next row";
+    const parts = [];
+    for (let i = 1; i < Math.min(row.length, header.length); i++) {
+      if (row[i]) parts.push(`${valueCols[i - 1] || `Column ${i}`}, ${row[i]}`);
+    }
+    if (parts.length) speech += `${label}: ${parts.join(". ")}. `;
+  });
+  const hidden = dataRows.length - capped.length;
+  if (hidden > 0) speech += `And ${hidden} more rows. `;
+  return speech;
+}
+
+function pipeTablesToSpeech(text) {
+  const lines = String(text).split("\n");
+  const out = [];
+  let tableLines = null;
+  const flush = () => {
+    if (tableLines) out.push(renderPipeTable(tableLines));
+    tableLines = null;
+  };
+  for (const line of lines) {
+    if (/^\s*\|.*\|/.test(line)) {
+      if (!tableLines) tableLines = [];
+      tableLines.push(line);
+    } else {
+      flush();
+      out.push(line);
+    }
+  }
+  flush();
+  return out.join("\n");
+}
 
 function markdownToSpeech(markdown) {
   let text = String(markdown || "");
-  text = text.replace(/```[\s\S]*?```/g, " ");
+  // Code fences first (so tables inside code stay inert), then pipe tables.
+  text = text.replace(/```[\s\S]*?```/g, codeBlockToSpeech);
+  text = pipeTablesToSpeech(text);
   text = text.replace(/`([^`]*)`/g, "$1");
   text = text.replace(/!\[[^\]]*\]\([^)]*\)/g, " ");
   text = text.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
@@ -141,6 +251,8 @@ async function synthesizeToMp3(tts, script, mp3Path, tmpDir) {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
+
+export { markdownToSpeech }; // handy for probing narration scripts in isolation
 
 // Synthesize (or reuse the cached) narration for one script. The cache key is
 // the engine + voice + full script hash, so edits to a story create a fresh
