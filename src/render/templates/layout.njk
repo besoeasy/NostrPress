@@ -255,7 +255,7 @@
         padding: 0 1.5rem;
         display: flex;
         align-items: center;
-        gap: 1.75rem;
+        justify-content: space-between;
       }
       .topbar-brand {
         text-decoration: none;
@@ -266,31 +266,6 @@
         white-space: nowrap;
       }
       .brand-dot { color: var(--accent); }
-      .topbar-nav {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        flex-wrap: wrap;
-      }
-      .topbar-link {
-        font-size: 0.875rem;
-        color: var(--ink-muted);
-        text-decoration: none;
-        padding: 0.375rem 0.625rem;
-        border-radius: 8px;
-        transition: color 0.15s, background 0.15s;
-      }
-      .topbar-link:hover { color: var(--ink); background: var(--surface-alt); }
-      .topbar-link.active { color: var(--ink); font-weight: 600; }
-      .topbar-meta {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        font-family: var(--font-mono);
-        font-size: 0.78rem;
-        color: var(--ink-subtle);
-      }
 
       /* ── Main layout ─────────────────────────────────── */
       .site-main {
@@ -494,9 +469,7 @@
       :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
       @media (max-width: 640px) {
-        .topbar-inner { height: 56px; padding: 0 1rem; gap: 1rem; }
-        .topbar-link { font-size: 0.8125rem; padding: 0.3rem 0.45rem; }
-        .hide-sm { display: none; }
+        .topbar-inner { height: 56px; padding: 0 1rem; }
         .site-main { padding: 2.5rem 1rem 5rem; }
         .post-link { grid-template-columns: 1fr; gap: 1.25rem; }
         .post-thumb-wrap { order: -1; width: 100%; aspect-ratio: 16 / 9; }
@@ -512,31 +485,16 @@
       <div class="topbar" role="banner">
         <div class="topbar-inner">
           <a href="{{ pathPrefix }}" class="topbar-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
-          <nav class="topbar-nav" aria-label="Site navigation">
-            <a href="{{ pathPrefix }}" class="topbar-link active">Latest</a>
-            {% if author.profile.website %}
-            <a href="{{ author.profile.website }}" target="_blank" rel="noopener noreferrer" class="topbar-link">Website</a>
-            {% endif %}
-            {% if author.npub %}
-            <a href="https://nosta.me/{{ author.npub }}" target="_blank" rel="noopener noreferrer" class="topbar-link">Nostr</a>
-            {% endif %}
-            {% if site.url %}
-            <a href="{{ site.url }}/feed.xml" target="_blank" rel="noopener noreferrer" class="topbar-link">RSS</a>
-            {% endif %}
-          </nav>
-          <div class="topbar-meta">
-            <span class="hide-sm">{% if articles %}{{ articles.length }} stories{% endif %}</span>
-            <button
-              class="theme-toggle"
-              id="theme-toggle"
-              type="button"
-              aria-label="Toggle dark mode"
-              title="Toggle dark mode"
-            >
-              <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-            </button>
-          </div>
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+          >
+            <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </button>
         </div>
       </div>
 
