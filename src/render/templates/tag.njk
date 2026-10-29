@@ -58,6 +58,13 @@
     {% for article in articles %}
     <li class="post-item">
       <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
+        <span class="post-thumb-wrap">
+          {% if article.image %}
+            <img src="{{ article.image | depth(pathPrefix) }}" alt="" class="post-thumb" loading="lazy" />
+          {% else %}
+            <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
+          {% endif %}
+        </span>
         <div class="post-body">
           <h2 class="post-title">{{ article.title }}</h2>
           {% if article.summary %}
@@ -71,13 +78,6 @@
             {% endif %}
           </div>
         </div>
-        <span class="post-thumb-wrap">
-          {% if article.image %}
-            <img src="{{ article.image | depth(pathPrefix) }}" alt="" class="post-thumb" loading="lazy" />
-          {% else %}
-            <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
-          {% endif %}
-        </span>
       </a>
     </li>
     {% endfor %}

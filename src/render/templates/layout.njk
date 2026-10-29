@@ -352,25 +352,42 @@
       /* ── Selection highlight ──────────────────────────── */
       ::selection { background: color-mix(in srgb, var(--accent) 18%, transparent); }
 
-      /* ── Story list (index / tag) ─────────────────────── */
+      /* ── Story cards (index / tag) ────────────────────── */
       .post-list {
         list-style: none;
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.25rem;
       }
       .post-item {
-        border-top: 1px solid var(--border);
-        padding: 2.4rem 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .post-item:hover {
+        border-color: var(--ink-subtle);
+        box-shadow: 0 16px 40px -28px color-mix(in srgb, var(--ink) 30%, transparent);
       }
       .post-link {
-        display: grid;
-        grid-template-columns: 1fr 216px;
-        gap: 2.25rem;
-        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
         text-decoration: none;
         color: inherit;
       }
-      .post-body { min-width: 0; }
+      .post-body {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.4rem 1.45rem 1.35rem;
+      }
       .post-kicker {
         font-family: var(--font-mono);
         font-size: 0.72rem;
@@ -378,28 +395,33 @@
         text-transform: uppercase;
         color: var(--accent);
         font-weight: 500;
-        margin-bottom: 0.7rem;
+        margin-bottom: 0.75rem;
       }
       .post-title {
-        font-size: 1.55rem;
+        font-size: 1.45rem;
         font-weight: 650;
-        letter-spacing: -0.025em;
-        line-height: 1.22;
-        margin-bottom: 0.7rem;
+        letter-spacing: -0.022em;
+        line-height: 1.24;
+        margin-bottom: 0.65rem;
         transition: color 0.15s;
+        text-wrap: balance;
       }
       .post-link:hover .post-title { color: var(--accent); }
       .post-summary {
         font-size: 0.96rem;
         color: var(--ink-muted);
         line-height: 1.7;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
       .post-meta {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-light);
+        width: 100%;
         display: flex;
         align-items: center;
         gap: 0.55rem;
@@ -408,7 +430,7 @@
         color: var(--ink-subtle);
       }
       .post-meta-sep { opacity: 0.5; }
-      .post-tags { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.9rem; }
+      .post-tags { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.85rem; }
       .post-tag {
         font-family: var(--font-mono);
         font-size: 0.75rem;
@@ -420,11 +442,9 @@
       .post-tag:hover { color: var(--accent); }
       .post-thumb-wrap {
         display: block;
-        width: 216px;
-        aspect-ratio: 16 / 10;
+        width: 100%;
+        aspect-ratio: 16 / 9;
         background: var(--surface-alt);
-        border: 1px solid var(--border);
-        border-radius: 10px;
         overflow: hidden;
       }
       .post-thumb {
@@ -432,9 +452,9 @@
         height: 100%;
         object-fit: cover;
         display: block;
-        transition: transform 0.4s ease;
+        transition: transform 0.45s ease;
       }
-      .post-link:hover .post-thumb { transform: scale(1.03); }
+      .post-link:hover .post-thumb { transform: scale(1.035); }
       .post-thumb-fallback {
         width: 100%;
         height: 100%;
@@ -442,9 +462,14 @@
         align-items: center;
         justify-content: center;
         font-weight: 650;
-        font-size: 2rem;
+        font-size: 2.4rem;
+        letter-spacing: -0.02em;
         color: var(--ink-subtle);
-        background: var(--surface-alt);
+        background: linear-gradient(135deg, var(--surface-alt), var(--surface-raised));
+      }
+
+      @media (max-width: 780px) {
+        .post-list { grid-template-columns: 1fr; }
       }
 
       /* ── Theme toggle ────────────────────────────────── */
@@ -471,9 +496,8 @@
       @media (max-width: 640px) {
         .topbar-inner { height: 56px; padding: 0 1rem; }
         .site-main { padding: 2.5rem 1rem 5rem; }
-        .post-link { grid-template-columns: 1fr; gap: 1.25rem; }
-        .post-thumb-wrap { order: -1; width: 100%; aspect-ratio: 16 / 9; }
-        .post-title { font-size: 1.3rem; }
+        .post-list { grid-template-columns: 1fr; gap: 1.5rem; }
+        .post-title { font-size: 1.25rem; }
         .footer-inner { padding: 0 1rem; }
         .footer-bottom { padding: 0 1rem; }
       }

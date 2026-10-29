@@ -250,18 +250,6 @@
       {% if not loop.first %}
       <li class="post-item">
         <a href="{{ pathPrefix }}{{ article.slug }}.html" class="post-link">
-          <div class="post-body">
-            <p class="post-kicker">{% if article.tags.length %}{{ article.tags[0] }}{% else %}Story{% endif %} · Nº {{ loop.index }}</p>
-            <h2 class="post-title">{{ article.title }}</h2>
-            {% if article.summary %}<p class="post-summary">{{ article.summary }}</p>{% endif %}
-            <div class="post-meta">
-              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
-              {% if article.readingTime %}<span class="post-meta-sep">·</span><span>{{ article.readingTime }} min</span>{% endif %}
-            </div>
-            {% if article.tags.length %}
-              <div class="post-tags">{% for tag in article.tags | take(3) %}<span class="post-tag">#{{ tag }}</span>{% endfor %}</div>
-            {% endif %}
-          </div>
           <span class="post-thumb-wrap">
             {% if article.image %}
               <img src="{{ article.image }}" alt="" class="post-thumb" loading="lazy" />
@@ -269,6 +257,18 @@
               <span class="post-thumb-fallback">{{ article.title[0] | upper }}</span>
             {% endif %}
           </span>
+          <div class="post-body">
+            <p class="post-kicker">{% if article.tags.length %}{{ article.tags[0] }}{% else %}Story{% endif %}</p>
+            <h2 class="post-title">{{ article.title }}</h2>
+            {% if article.summary %}<p class="post-summary">{{ article.summary }}</p>{% endif %}
+            {% if article.tags.length %}
+              <div class="post-tags">{% for tag in article.tags | take(3) %}<span class="post-tag">#{{ tag }}</span>{% endfor %}</div>
+            {% endif %}
+            <div class="post-meta">
+              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+              {% if article.readingTime %}<span class="post-meta-sep">·</span><span>{{ article.readingTime }} min</span>{% endif %}
+            </div>
+          </div>
         </a>
       </li>
       {% endif %}
