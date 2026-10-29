@@ -204,7 +204,7 @@ function escapeXml(str) {
     .replace(/'/g, "&apos;");
 }
 
-function generateRss(context, outputDir) {
+function generateRss(context, outputDir, audioItems = []) {
   const siteUrl = context.site.url;
   if (!siteUrl) return null;
 
@@ -213,10 +213,29 @@ function generateRss(context, outputDir) {
   const authorName = author.display_name || author.name || title;
   const articles = context.articles.slice(0, 20); // RSS: latest 20
 
+  // Podcast metadata: stories with narration attach their build-time MP3 as
+  // an <enclosure>, turning feed.xml into a subscribable podcast feed.
+  const audioBySlug = new Map(audioItems.map((i) => [i.slug, i]));
+  const coverUrl = `${siteUrl.replace(/\/+$/, "")}/og.png`;
+  const base = `${siteUrl.replace(/\/+$/, "")}`;
+
   const items = articles.map((article) => {
-    const articleUrl = `${siteUrl}/${article.slug}.html`;
+    const articleUrl = `${base}/${article.slug}.html`;
     const pubDate = new Date(article.published_at).toUTCString();
     const tags = (article.tags || []).map((t) => `      <category>${escapeXml(t)}</category>`).join("\n");
+
+    // Enclosure only when the clip actually exists in this build.
+    let audioTags = "";
+    const audio = audioBySlug.get(article.slug);
+    const audioFile = path.join(outputDir, "audio", `${article.slug}.mp3`);
+    if (audio && fs.existsSync(audioFile)) {
+      const enclosureUrl = `${base}/audio/${article.slug}.mp3`;
+      const bytes = fs.statSync(audioFile).size;
+      audioTags = `
+      <enclosure url="${escapeXml(enclosureUrl)}" length="${bytes}" type="audio/mpeg" />
+      <itunes:author>${escapeXml(authorName)}</itunes:author>
+      <itunes:duration>${audio.seconds || audio.minutes * 60}</itunes:duration>`;
+    }
 
     return `    <item>
       <title>${escapeXml(article.title)}</title>
@@ -225,15 +244,15 @@ function generateRss(context, outputDir) {
       <pubDate>${pubDate}</pubDate>
       <description>${escapeXml(article.summary || "")}</description>
       <author>${escapeXml(authorName)}</author>
-${tags}
+${tags}${audioTags}
     </item>`;
   }).join("\n");
 
   const buildDate = new Date().toUTCString();
-  const feedUrl = `${siteUrl}/feed.xml`;
+  const feedUrl = `${base}/feed.xml`;
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
     <title>${escapeXml(title)}</title>
     <link>${escapeXml(siteUrl)}</link>
@@ -242,6 +261,9 @@ ${tags}
     <lastBuildDate>${buildDate}</lastBuildDate>
     <generator>NostrPress</generator>
     <atom:link href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml" />
+    <itunes:author>${escapeXml(authorName)}</itunes:author>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="${escapeXml(coverUrl)}" />
 ${items}
   </channel>
 </rss>`;
@@ -488,7 +510,7 @@ async function run() {
 
   if (hasSiteUrl) {
     step("Generating RSS + JSON feeds & sitemap");
-    rssPath = generateRss(context, config.output_dir);
+    rssPath = generateRss(context, config.output_dir, audioResult?.items ?? []);
     jsonFeedPath = generateJsonFeed(context, config.output_dir);
     sitemapPath = generateSitemap(context, config.output_dir);
     stepDone(`→ feed.xml + feed.json + sitemap.xml`);

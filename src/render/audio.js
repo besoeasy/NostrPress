@@ -225,7 +225,7 @@ export async function generateAudio({ context, outputDir, cacheDir }) {
     const { mp3, seconds } = renderScriptToMp3(engine, audioCacheDir, article.slug, script);
     fs.copyFileSync(mp3, path.join(distAudioDir, `${article.slug}.mp3`));
     article.audioMinutes = Math.max(1, Math.ceil(seconds / 60));
-    items.push({ slug: article.slug, minutes: article.audioMinutes, mp3 });
+    items.push({ slug: article.slug, minutes: article.audioMinutes, seconds, mp3 });
   }
 
   // Whole-blog episode: spoken intro + every story in order, 1.2s pauses.
