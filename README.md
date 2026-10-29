@@ -17,13 +17,13 @@ Turn your [Nostr](https://nostr.com) long-form posts into a minimal static blog.
 
 ## Deploy
 
-**Recommended — fork + GitHub Pages.** Free hosting, and a built-in workflow rebuilds the blog every 12 hours, so new Nostr notes appear on their own:
+**Recommended — fork + GitHub Pages.** Free hosting, and a built-in workflow rebuilds the blog on a weekly schedule (or on demand from the **Actions** tab), so new Nostr notes appear on their own:
 
 1. [Fork this repo](https://github.com/besoeasy/NostrPress/fork)
 2. In your fork: **Settings → Secrets and variables → Actions** → add `NPUB` (your `npub1...` or `nprofile1...`)
 3. **Settings → Pages** → Build and deployment → Source: **GitHub Actions** — that's it
 
-It deploys on push, re-syncs on a 12-hour schedule, and can be re-run any time from the **Actions** tab.
+It deploys on push, re-syncs weekly (Mondays 03:00 UTC), and can be triggered any time via **workflow dispatch** from the **Actions** tab.
 
 ### One-click deploys
 
