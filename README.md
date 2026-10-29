@@ -1,227 +1,46 @@
 # NostrPress
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Star History Rank](https://api.star-history.com/badge?repo=besoeasy/NostrPress&type=rank)](https://www.star-history.com/besoeasy/NostrPress)
 
-Turn your [Nostr](https://nostr.com) long-form posts ([NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md)) into a fast, standalone static blog. One command, no config.
+Turn your [Nostr](https://nostr.com) long-form posts into a minimal static blog. One command, no config, no database — the build fetches your notes, renders the site, and even narrates it. You ship a folder of files.
 
----
+## Features
 
-## ⚡ Quick Deploy (Free 1-Click Hosting)
+- **One command, zero config** — pass your `npub`, get a complete blog
+- **Pure static output** — plain HTML/CSS/JS; host anywhere or drop it into an existing app
+- **Audio narration** — every article synthesized into a natural-voiced MP3 with an in-page player, plus one full audio edition of the whole blog
+- **Podcast-ready RSS** — iTunes tags and per-episode audio enclosures at `/feed.xml`, plus a sitemap (needs `SITE_URL`)
+- **Build-time social cards** — an Open Graph image generated for every page, no runtime JS
+- **Fast cached rebuilds** — changed posts re-render, untouched pages and audio stay cached
+- **Dark / light themes** — follows OS preference, manual toggle, no flash
+- **Tag pages, print stylesheet, mirrored media** — images and videos are downloaded and cached into the output
 
-Deploy your own live, auto-updating Nostr blog for free with one click:
+## Deploy
 
-| Provider | One-Click Deploy | Configuration |
+**Recommended — fork + GitHub Pages.** Free hosting, and a built-in workflow rebuilds the blog every 12 hours, so new Nostr notes appear on their own:
+
+1. [Fork this repo](https://github.com/besoeasy/NostrPress/fork)
+2. In your fork: **Settings → Secrets and variables → Actions** → add `NPUB` (your `npub1...` or `nprofile1...`)
+3. **Settings → Pages** → Build and deployment → Source: **GitHub Actions** — that's it
+
+It deploys on push, re-syncs on a 12-hour schedule, and can be re-run any time from the **Actions** tab.
+
+### One-click deploys
+
+| Provider | Deploy | Notes |
 | :--- | :--- | :--- |
-| **Vercel** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbesoeasy%2FNostrPress&env=NPUB,SITE_URL&envDescription=NPUB%20is%20your%20Nostr%20public%20key%20(npub1...)%20or%20profile%20(nprofile1...).%20SITE_URL%20is%20optional%20(e.g.%20https%3A%2F%2Fmyblog.vercel.app)%20for%20RSS%20and%20sitemap.&envLink=https%3A%2F%2Fnostr.com&project-name=nostrpress-blog&repository-name=nostrpress-blog) | Configured via `vercel.json`. Prompts for your `NPUB`. |
-| **Netlify** | [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/besoeasy/NostrPress#NPUB=&SITE_URL=) | Configured via `netlify.toml`. Prompts for your `NPUB`. |
-| **Render** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/besoeasy/NostrPress) | Configured via `render.yaml`. Prompts for your `NPUB`. |
-| **Cloudflare Pages** | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/besoeasy/NostrPress) | Global edge CDN. Build: `npm run build`, Output: `blog`. |
-| **GitHub Pages** | [![Deploy to GitHub Pages](https://img.shields.io/badge/Deploy%20to-GitHub%20Pages-181717?style=flat&logo=github)](https://github.com/besoeasy/NostrPress/fork) | 100% free with auto-sync schedule via [GitHub Actions](#github-pages-100-free--auto-sync). |
+| **Vercel** | [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbesoeasy%2FNostrPress&env=NPUB,SITE_URL&envDescription=NPUB%20is%20your%20Nostr%20public%20key%20(npub1...)%20or%20profile%20(nprofile1...).%20SITE_URL%20is%20optional%20(e.g.%20https%3A%2F%2Fmyblog.vercel.app)%20for%20RSS%20and%20sitemap.&envLink=https%3A%2F%2Fnostr.com&project-name=nostrpress-blog&repository-name=nostrpress-blog) | Prompts for `NPUB`; config in `vercel.json` |
+| **Netlify** | [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/besoeasy/NostrPress#NPUB=&SITE_URL=) | Prompts for `NPUB`; config in `netlify.toml` |
+| **Render** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/besoeasy/NostrPress) | Prompts for `NPUB`; config in `render.yaml` |
+| **Cloudflare Pages** | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/besoeasy/NostrPress) | Build `npm run build`, output `dist` |
 
----
-
-## How it works
-
-1. You pass your `npub` or `nprofile`
-2. NostrPress fetches your articles, profile, and comments from Nostr relays
-3. It downloads media assets, caches them locally, and generates a static site into `dist`
-4. Drop that folder anywhere — any host, any framework
-
----
-
-## Run it
-
-**Direct CLI Arguments (via npx)**
-```bash
-npx github:besoeasy/NostrPress npub1...
-npx github:besoeasy/NostrPress npub1... --url https://myblog.com
-```
-
-**Environment Variables**
-```bash
-NPUB=npub1... npx github:besoeasy/NostrPress
-```
-
-**Bun**
-```bash
-bunx github:besoeasy/NostrPress npub1...
-```
-
-Output lands in `dist/` — ready to serve.
-
----
-
-## Use with any framework
-
-The generated `dist` folder is pure static HTML/CSS/JS. Copy it into your framework's public directory:
-
-### Vue (Vite)
-
-```json
-// package.json
-{
-  "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
-    "dev": "vite",
-    "build": "npm run blog:fetch && vite build",
-    "preview": "vite preview"
-  }
-}
-```
-
-Blog lives at `/blog/` alongside your Vue app. No vite config changes needed — Vite serves everything in `public/` automatically.
-
----
-
-### React (Vite or CRA)
-
-**Vite + React**:
-
-```json
-{
-  "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
-    "dev": "vite",
-    "build": "npm run blog:fetch && vite build"
-  }
-}
-```
-
-**Create React App**:
-
-```json
-{
-  "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
-    "start": "react-scripts start",
-    "build": "npm run blog:fetch && react-scripts build"
-  }
-}
-```
-
----
-
-### Nuxt
-
-```json
-{
-  "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
-    "dev": "nuxt dev",
-    "build": "npm run blog:fetch && nuxt build",
-    "generate": "npm run blog:fetch && nuxt generate"
-  }
-}
-```
-
----
-
-### Next.js
-
-```json
-{
-  "scripts": {
-    "blog:fetch": "npx github:besoeasy/NostrPress npub1... && rm -rf ./public/blog && cp -r dist ./public/blog",
-    "dev": "next dev",
-    "build": "npm run blog:fetch && next build"
-  }
-}
-```
-
----
-
-### Plain HTML / Static Hosting
+## Run it locally
 
 ```bash
 npx github:besoeasy/NostrPress npub1...
-# serve dist with any static web server
-npx serve dist
 ```
 
----
-
-### GitHub Pages (100% Free & Auto-Sync)
-
-NostrPress includes a pre-configured GitHub Actions workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) that builds your blog and automatically syncs new Nostr articles:
-
-1. **[Fork this repository](https://github.com/besoeasy/NostrPress/fork)** to your GitHub account.
-2. In your fork, go to **Settings** > **Secrets and variables** > **Actions** and add:
-   - `NPUB`: Your Nostr public key (`npub1...` or `nprofile1...`).
-   - `SITE_URL` *(optional)*: `https://<your-username>.github.io/<repo-name>` (enables RSS feed & sitemap).
-3. Go to **Settings** > **Pages**, and under **Build and deployment** > **Source**, select **GitHub Actions**.
-4. That's it! Your blog will deploy immediately and re-sync every 12 hours whenever you publish new Nostr articles.
-
----
-
-## What you get
-
-```
-dist/
-├── index.html          ← homepage with profile & post index
-├── your-post-slug.html ← individual article pages
-├── tags/
-│   └── tag-name/
-│       └── index.html  ← posts filtered by tag
-├── assets/
-│   ├── images/         ← downloaded & cached media assets
-│   └── videos/         ← downloaded & cached video files
-├── css/
-│   ├── site.css        ← compiled stylesheet
-│   └── print.css       ← print stylesheet
-└── js/
-    └── site.js         ← theme switcher & client helpers
-```
-
----
-
-## CLI Options & Flags
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `<npub_or_nprofile>` | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) | Positional |
-| `-n, --npub <key>` | Explicit flag for `npub` or `nprofile` | `$NPUB` |
-| `-u, --url <url>` | Canonical site URL (enables RSS feed, sitemap & SEO tags) | `$SITE_URL` |
-| `-r, --relay <relay>` | Custom relay URL (can be specified multiple times) | Default relays + NIP-65 |
-| `-c, --clean` | Clear local cache before building | `false` |
-| `--no-media` | Skip downloading media assets locally | `false` |
-| `-h, --help` | Show help message | — |
-| `-v, --version` | Show version | — |
-
----
-
-## Environment variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NPUB` | ✅ yes (or pass as CLI arg) | Your Nostr public key (`npub1...`) or profile (`nprofile1...`) |
-| `SITE_URL` | optional | Canonical base URL (e.g. `https://myblog.com`). Enables RSS (`/feed.xml`), sitemap (`/sitemap.xml`), and canonical link tags. |
-| `RELAYS` | optional | Comma-separated list of custom relays |
-| `CLEAN` | optional | Set to `true` to clear cache before build |
-
-### Example with Site URL
-
-```bash
-npx github:besoeasy/NostrPress npub1... --url https://myblog.com
-```
-
-This generates:
-
-```
-dist/
-├── index.html     ← homepage with all posts & profile
-├── feed.xml       ← RSS 2.0 feed (latest 20 posts)
-├── sitemap.xml    ← XML sitemap (all pages + tag pages)
-├── tags/          ← tag archive pages
-├── assets/        ← locally downloaded and cached media
-└── ...
-```
-
----
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=besoeasy/NostrPress&type=date&legend=top-left)](https://www.star-history.com/?repos=besoeasy%2FNostrPress&type=date&legend=top-left)
+Output lands in `dist/`. Pass `--url https://myblog.com` to enable the RSS feed, sitemap and podcast enclosure URLs.
 
 ## License
 
