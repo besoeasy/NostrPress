@@ -143,12 +143,16 @@ export function renderSite(context, outputDir) {
     article.tagSlugMap = Object.fromEntries(
       article.tags.map((tag, index) => [tag, article.tagSlugs[index]])
     );
-    for (const tag of article.tags) {
-      const tagSlug = normalizeTag(tag);
-      if (!tagMap.has(tagSlug)) {
-        tagMap.set(tagSlug, { name: tag, slug: tagSlug, articles: [] });
+    for (const tagIndex of article.tags.keys()) {
+      const tagSlug = article.tagSlugs[tagIndex];
+      // Guard against tag variants ("Debian"/"debian") collapsing to the same
+      // slug — an article should appear only once per tag page.
+      const tagArticles = tagMap.has(tagSlug)
+        ? tagMap.get(tagSlug).articles
+        : tagMap.set(tagSlug, { name: article.tags[tagIndex], slug: tagSlug, articles: [] }).get(tagSlug).articles;
+      if (tagArticles[tagArticles.length - 1] !== article) {
+        tagArticles.push(article);
       }
-      tagMap.get(tagSlug).articles.push(article);
     }
   }
 

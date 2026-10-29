@@ -111,6 +111,23 @@ function dedupeArticles(articles) {
   return [...bySlug.values()];
 }
 
+// Tags can repeat in variant form ("Debian", "debian", "Debian ") and every
+// variant slugifies to the same page — collapse them to the first occurrence
+// so tag chips, RSS categories and tag pages list each article once.
+function dedupeArticleTags(articles) {
+  for (const article of articles) {
+    if (!article.tags?.length) continue;
+    const seen = new Set();
+    article.tags = article.tags.filter((tag) => {
+      const slug = normalizeTag(tag);
+      if (seen.has(slug)) return false;
+      seen.add(slug);
+      return true;
+    });
+  }
+  return articles;
+}
+
 function buildContext(config, npub, pubkey, profile, articles) {
   const siteTitle = config.site.title === "auto" ? profile.display_name || profile.name || npub : config.site.title;
   const siteDescription = config.site.description === "auto" ? profile.about || `Posts by ${siteTitle}` : config.site.description;
@@ -367,7 +384,7 @@ async function run() {
   step("Fetching articles");
   const events = await fetchArticles(pool, activeRelays, config, identity.pubkey);
   const parsed = events.map(parseArticle);
-  const deduped = dedupeArticles(parsed);
+  const deduped = dedupeArticleTags(dedupeArticles(parsed));
   const sorted = sortArticles(deduped);
   const withSummary = sorted.map((article) => ({
     ...article,
