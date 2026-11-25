@@ -77,6 +77,55 @@
   }
   .article-meta-sep { opacity: 0.4; }
 
+  .article-byline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+  }
+  .article-byline-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    flex-shrink: 0;
+  }
+  .article-byline-avatar-fallback {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--ink-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 650;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .article-byline-text { min-width: 0; }
+  .article-byline-name {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .article-byline-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .article-byline-name a:hover { color: var(--accent); }
+  .article-byline-detail {
+    display: block;
+    font-size: 0.84rem;
+    color: var(--ink-subtle);
+  }
+
   /* Audio narration player */
   .article-audio {
     display: flex;
@@ -350,6 +399,106 @@
     border-bottom-color: var(--border);
   }
 
+  /* ── Author card ──────────────────────────────── */
+  .author-card {
+    max-width: var(--max-w-prose);
+    margin: 3.5rem auto 0;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-alt);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .author-card-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .author-card-avatar-fallback {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .author-card-body { min-width: 0; }
+  .author-card-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 0.35rem;
+  }
+  .author-card-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+  .author-card-bio {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+
+  .post-nav {
+    max-width: var(--max-w-prose);
+    margin: 2rem auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    background: var(--surface);
+    transition: border-color 0.15s, background 0.15s;
+    min-width: 0;
+  }
+  .post-nav-link:hover {
+    border-color: var(--ink-subtle);
+    background: var(--surface-alt);
+  }
+  .post-nav-link.next { text-align: right; }
+  .post-nav-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+  }
+  .post-nav-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .post-nav-link:hover .post-nav-title { color: var(--accent); }
+  @media (max-width: 640px) {
+    .post-nav { grid-template-columns: 1fr; }
+    .post-nav-link.next { text-align: left; }
+  }
+
   /* ── Related articles ─────────────────────────── */
   .related-section {
     margin-top: 4.5rem;
@@ -509,20 +658,26 @@
   {% endif %}
 
   <header class="article-header">
+    {% if article.readingTime or article.wordCount or article.audioMinutes %}
     <div class="article-meta">
-      <time datetime="{{ article.published_at | date('iso') }}" itemprop="datePublished">{{ article.published_at | date("Y-m-d") }}</time>
-      {% if article.readingTime %}
-        <span class="article-meta-sep">·</span>
-        <span>{{ article.readingTime }} min read</span>
+      {% if article.readingTime %}<span>{{ article.readingTime }} min read</span>{% endif %}
+      {% if article.wordCount %}{% if article.readingTime %}<span class="article-meta-sep">·</span>{% endif %}<span>{{ article.wordCount }} words</span>{% endif %}
+      {% if article.audioMinutes %}{% if article.readingTime or article.wordCount %}<span class="article-meta-sep">·</span>{% endif %}<span>{{ article.audioMinutes }} min listen</span>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="article-byline">
+      {% if author.profile.picture %}
+        <img src="{{ author.profile.picture }}" alt="" class="article-byline-avatar" loading="eager" decoding="async" />
+      {% else %}
+        <span class="article-byline-avatar-fallback" aria-hidden="true">{{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}</span>
       {% endif %}
-      {% if article.wordCount %}
-        <span class="article-meta-sep">·</span>
-        <span>{{ article.wordCount }} words</span>
-      {% endif %}
-      {% if article.audioMinutes %}
-        <span class="article-meta-sep">·</span>
-        <span>{{ article.audioMinutes }} min listen</span>
-      {% endif %}
+      <div class="article-byline-text">
+        <span class="article-byline-name">{{ author.profile.display_name or author.profile.name or site.title }}</span>
+        <span class="article-byline-detail">
+          {{ article.published_at | date("human") }}{% if article.readingTime %} · {{ article.readingTime }} min read{% endif %}
+        </span>
+      </div>
     </div>
 
     <h1 class="article-title" itemprop="headline">{{ article.title }}</h1>
@@ -574,6 +729,40 @@
   </div>
 </article>
 
+<aside class="author-card" aria-label="About the author">
+  {% if author.profile.picture %}
+    <img src="{{ author.profile.picture }}" alt="" class="author-card-avatar" loading="lazy" decoding="async" />
+  {% else %}
+    <span class="author-card-avatar-fallback" aria-hidden="true">{{ (author.profile.display_name or author.profile.name or "?")[0] | upper }}</span>
+  {% endif %}
+  <div class="author-card-body">
+    <p class="author-card-kicker">Written by</p>
+    <p class="author-card-name">{{ author.profile.display_name or author.profile.name or site.title }}</p>
+    {% if author.profile.about %}
+      <p class="author-card-bio">{{ author.profile.about | truncate(220) }}</p>
+    {% endif %}
+  </div>
+</aside>
+
+{% if newerArticle or olderArticle %}
+<nav class="post-nav" aria-label="More stories">
+  {% if newerArticle %}
+    <a class="post-nav-link prev" href="{{ pathPrefix }}{{ newerArticle.slug }}.html">
+      <span class="post-nav-kicker">← Newer</span>
+      <span class="post-nav-title">{{ newerArticle.title }}</span>
+    </a>
+  {% else %}
+    <span></span>
+  {% endif %}
+  {% if olderArticle %}
+    <a class="post-nav-link next" href="{{ pathPrefix }}{{ olderArticle.slug }}.html">
+      <span class="post-nav-kicker">Older →</span>
+      <span class="post-nav-title">{{ olderArticle.title }}</span>
+    </a>
+  {% endif %}
+</nav>
+{% endif %}
+
 <!-- Related articles -->
 {% if relatedArticles.length %}
   <section class="related-section" aria-labelledby="related-heading">
@@ -590,7 +779,7 @@
               </div>
             {% endif %}
             <div class="related-title">{{ related.title }}</div>
-            <div class="related-date">{{ related.published_at | date("Y-m-d") }}</div>
+            <div class="related-date">{{ related.published_at | date("short") }}</div>
           </a>
         </li>
       {% endfor %}
@@ -617,7 +806,7 @@
           <div class="comment-body">
             <div class="comment-header">
               <span class="comment-author">{{ comment.author_name or comment.pubkey.slice(0, 8) + '…' }}</span>
-              <time class="comment-date" datetime="{{ comment.created_at * 1000 | date('iso') }}">{{ (comment.created_at * 1000) | date("Y-m-d") }}</time>
+              <time class="comment-date" datetime="{{ comment.created_at * 1000 | date('iso') }}">{{ (comment.created_at * 1000) | date("short") }}</time>
             </div>
             <p class="comment-text">{{ comment.content }}</p>
           </div>

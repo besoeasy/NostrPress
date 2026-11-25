@@ -16,6 +16,7 @@ const FONT_SOURCES = [
   ["inter-500-normal.ttf", "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.ttf"],
   ["inter-600-normal.ttf", "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.ttf"],
   ["inter-700-normal.ttf", "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf"],
+  ["fraunces-700-normal.ttf", "https://cdn.jsdelivr.net/fontsource/fonts/fraunces@latest/latin-700-normal.ttf"],
   ["jetbrains-mono-500-normal.ttf", "https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-500-normal.ttf"],
 ];
 
@@ -201,7 +202,7 @@ function cardSvg(input) {
     const isLast = index === titleLines.length - 1;
     const dotMarkup = isLast && !truncated ? `<tspan fill="#0070f3">.</tspan>` : "";
     parts.push(
-      `<text x="${pad}" y="${titleTop + index * titleLh}" font-family="Inter" font-weight="700" font-size="${titleSize}" letter-spacing="${-(titleSize * 0.042).toFixed(2)}" fill="${ink}">${escapeXml(line)}${dotMarkup}</text>`
+      `<text x="${pad}" y="${titleTop + index * titleLh}" font-family="Fraunces" font-weight="700" font-size="${titleSize}" letter-spacing="${-(titleSize * 0.022).toFixed(2)}" fill="${ink}">${escapeXml(line)}${dotMarkup}</text>`
     );
   });
 

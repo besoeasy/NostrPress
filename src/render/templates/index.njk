@@ -256,7 +256,7 @@
     <div class="featured-top">
       <p class="featured-kicker">Featured story</p>
       <div class="featured-meta">
-        <time datetime="{{ featured.published_at | date('iso') }}">{{ featured.published_at | date("Y-m-d") }}</time>
+        <time datetime="{{ featured.published_at | date('iso') }}">{{ featured.published_at | date("human") }}</time>
         {% if featured.readingTime %}<span>·</span><span>{{ featured.readingTime }} min read</span>{% endif %}
       </div>
     </div>
@@ -291,7 +291,7 @@
               <div class="post-tags">{% for tag in article.tags | take(3) %}<span class="post-tag">#{{ tag }}</span>{% endfor %}</div>
             {% endif %}
             <div class="post-meta">
-              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+              <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("short") }}</time>
               {% if article.readingTime %}<span class="post-meta-sep">·</span><span>{{ article.readingTime }} min</span>{% endif %}
             </div>
           </div>

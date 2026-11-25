@@ -75,7 +75,7 @@
     <!-- Editorial fonts: Fraunces (display serif) + Inter (sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..700;1,9..144,500..700&family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
     <script>
       /* Apply theme before first paint to avoid flash of wrong theme */
@@ -124,7 +124,7 @@
         --selection-ink: #ffffff;
         --radius: 12px;
         --radius-sm: 8px;
-        --font-display: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        --font-display: "Fraunces", Georgia, "Times New Roman", serif;
         --font-sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
         --max-w: 1040px;
@@ -271,6 +271,19 @@
         white-space: nowrap;
       }
       .brand-dot { color: var(--accent); }
+      .topbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+      .topbar-link {
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .topbar-link:hover { color: var(--ink); }
 
       /* ── Main layout ─────────────────────────────────── */
       .site-main {
@@ -500,6 +513,8 @@
 
       @media (max-width: 640px) {
         .topbar-inner { height: 56px; padding: 0 1rem; }
+        .topbar-nav { gap: 0.85rem; }
+        .topbar-link { font-size: 0.82rem; }
         .site-main { padding: 2.5rem 1rem 5rem; }
         .post-list { grid-template-columns: 1fr; gap: 1.5rem; }
         .post-title { font-size: 1.25rem; }
@@ -514,16 +529,21 @@
       <div class="topbar" role="banner">
         <div class="topbar-inner">
           <a href="{{ pathPrefix }}" class="topbar-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
-          <button
-            class="theme-toggle"
-            id="theme-toggle"
-            type="button"
-            aria-label="Toggle dark mode"
-            title="Toggle dark mode"
-          >
-            <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-          </button>
+          <div class="topbar-nav">
+            <a href="{{ pathPrefix }}" class="topbar-link">Home</a>
+            <a href="{{ pathPrefix }}topics/" class="topbar-link">Topics</a>
+            {% if site.url %}<a href="{{ site.url }}/feed.xml" class="topbar-link">RSS</a>{% endif %}
+            <button
+              class="theme-toggle"
+              id="theme-toggle"
+              type="button"
+              aria-label="Toggle dark mode"
+              title="Toggle dark mode"
+            >
+              <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -542,6 +562,7 @@
           <p class="footer-h">Explore</p>
           <ul class="footer-links">
             <li><a href="{{ pathPrefix }}">Latest stories</a></li>
+            <li><a href="{{ pathPrefix }}topics/">Topics</a></li>
             {% if audio and audio.wholeBlog %}<li><a href="{{ pathPrefix }}audio/whole-blog.mp3">Listen to whole blog ({{ audio.wholeBlog.minutes }} min)</a></li>{% endif %}
             {% if site.url %}<li><a href="{{ site.url }}/feed.xml">RSS feed</a></li>
             <li><a href="{{ site.url }}/feed.json">JSON feed</a></li>

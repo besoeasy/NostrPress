@@ -1,0 +1,106 @@
+{% extends "layout.njk" %}
+
+{% set pageTitle = "Topics · " ~ site.title %}
+{% set pageDescription = "Browse topics on " ~ site.title %}
+{% set canonicalUrl = pathPrefix ~ "topics/" %}
+{% set ogType = "website" %}
+{% set ogImage = "" %}
+{% if socialCards %}
+  {% set ogImage = ogBase ~ "og.png" %}
+{% endif %}
+
+{% block additionalHead %}
+<style>
+  .topics-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin-bottom: 3rem;
+    transition: color 0.15s;
+  }
+  .topics-back:hover { color: var(--ink); }
+  .topics-back svg { width: 15px; height: 15px; }
+  .topics-header { margin-bottom: 3rem; }
+  .topics-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 7vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .topics-count {
+    margin-top: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-subtle);
+  }
+  .topic-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .topic-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .topic-link:hover {
+    border-color: var(--ink-subtle);
+    background: var(--surface-alt);
+  }
+  .topic-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .topic-link:hover .topic-name { color: var(--accent); }
+  .topic-meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-subtle);
+    white-space: nowrap;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+  <a href="{{ pathPrefix }}" class="topics-back" aria-label="Back to front page">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    Front page
+  </a>
+
+  <header class="topics-header">
+    <h1 class="topics-title">Topics</h1>
+    <p class="topics-count">{{ topics.length }} {{ 'topic' if topics.length == 1 else 'topics' }}</p>
+  </header>
+
+  {% if topics.length %}
+  <ul class="topic-list" role="list">
+    {% for topic in topics %}
+    <li>
+      <a href="{{ pathPrefix }}tags/{{ topic.slug }}/" class="topic-link">
+        <span class="topic-name">#{{ topic.name }}</span>
+        <span class="topic-meta">{{ topic.count }} {{ 'story' if topic.count == 1 else 'stories' }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p style="color: var(--ink-muted);">No topics yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

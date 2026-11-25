@@ -96,11 +96,28 @@ export function createRenderer(templateDir) {
   const env = nunjucks.configure(templateDir, { autoescape: true });
   env.addFilter("date", (value, format) => {
     const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
     if (format === "Y-m-d") {
       const year = date.getUTCFullYear();
       const month = String(date.getUTCMonth() + 1).padStart(2, "0");
       const day = String(date.getUTCDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
+    }
+    if (format === "human") {
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      });
+    }
+    if (format === "short") {
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "UTC",
+      });
     }
     if (format === "iso") {
       return date.toISOString();
@@ -160,14 +177,31 @@ export function renderSite(context, outputDir, { socialCards = false } = {}) {
     }
   }
 
-  for (const article of articlesSorted) {
+  for (let i = 0; i < articlesSorted.length; i++) {
+    const article = articlesSorted[i];
     const relatedArticles = findRelatedArticles(article, articlesSorted);
-    const articleHtml = env.render("article.njk", { ...context, article, relatedArticles, pathPrefix: "./", ogBase: ogBaseFor("./"), socialCards });
+    const newerArticle = i > 0 ? articlesSorted[i - 1] : null;
+    const olderArticle = i < articlesSorted.length - 1 ? articlesSorted[i + 1] : null;
+    const articleHtml = env.render("article.njk", {
+      ...context,
+      article,
+      relatedArticles,
+      newerArticle,
+      olderArticle,
+      pathPrefix: "./",
+      ogBase: ogBaseFor("./"),
+      socialCards,
+    });
     writeFile(path.join(outputDir, `${article.slug}.html`), articleHtml);
   }
 
+  const topics = [];
   for (const { name, slug, articles } of tagMap.values()) {
     const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles, pathPrefix: "../../", ogBase: ogBaseFor("../../"), socialCards });
     writeFile(path.join(outputDir, "tags", slug, "index.html"), tagHtml);
+    topics.push({ name, slug, count: articles.length });
   }
+  topics.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const topicsHtml = env.render("topics.njk", { ...context, topics, pathPrefix: "../", ogBase: ogBaseFor("../"), socialCards });
+  writeFile(path.join(outputDir, "topics", "index.html"), topicsHtml);
 }

@@ -71,7 +71,7 @@
             <p class="post-summary">{{ article.summary }}</p>
           {% endif %}
           <div class="post-meta">
-            <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("Y-m-d") }}</time>
+            <time datetime="{{ article.published_at | date('iso') }}">{{ article.published_at | date("short") }}</time>
             {% if article.readingTime %}
               <span class="post-meta-sep">·</span>
               <span>{{ article.readingTime }} min</span>
