@@ -1,0 +1,113 @@
+{% extends "layout.njk" %}
+
+{% set pageTitle = "Archive · " ~ site.title %}
+{% set pageDescription = "All stories from " ~ site.title %}
+{% set canonicalUrl = pathPrefix ~ "archive/" %}
+{% set ogType = "website" %}
+{% set ogImage = "" %}
+{% if socialCards %}
+  {% set ogImage = ogBase ~ "og.png" %}
+{% endif %}
+
+{% block additionalHead %}
+<style>
+  .archive-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin-bottom: 3rem;
+    transition: color 0.15s;
+  }
+  .archive-back:hover { color: var(--ink); }
+  .archive-back svg { width: 15px; height: 15px; }
+  .archive-header { margin-bottom: 3rem; }
+  .archive-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 7vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .archive-count {
+    margin-top: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-subtle);
+  }
+  .archive-year { margin-bottom: 3rem; }
+  .archive-year-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-subtle);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .archive-list { list-style: none; display: grid; }
+  .archive-item a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-light);
+    text-decoration: none;
+    color: inherit;
+  }
+  .archive-item:last-child a { border-bottom: none; }
+  .archive-item-title {
+    font-size: 1rem;
+    font-weight: 550;
+    color: var(--ink);
+    line-height: 1.45;
+    transition: color 0.15s;
+  }
+  .archive-item a:hover .archive-item-title { color: var(--accent); }
+  .archive-item-meta {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-subtle);
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .archive-item a { grid-template-columns: 1fr; gap: 0.25rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+  <a href="{{ pathPrefix }}" class="archive-back" aria-label="Back to front page">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    Front page
+  </a>
+
+  <header class="archive-header">
+    <h1 class="archive-title">Archive</h1>
+    <p class="archive-count">{{ articles.length }} {{ 'story' if articles.length == 1 else 'stories' }}</p>
+  </header>
+
+  {% for group in archive %}
+  <section class="archive-year" aria-labelledby="year-{{ group.year }}">
+    <h2 class="archive-year-title" id="year-{{ group.year }}">{{ group.year }}</h2>
+    <ul class="archive-list" role="list">
+      {% for article in group.articles %}
+      <li class="archive-item">
+        <a href="{{ pathPrefix }}{{ article.slug }}.html">
+          <span class="archive-item-title">{{ article.title }}</span>
+          <span class="archive-item-meta">{{ article.published_at | date("short") }}{% if article.readingTime %} · {{ article.readingTime }} min{% endif %}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

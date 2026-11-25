@@ -515,6 +515,7 @@
         .topbar-inner { height: 56px; padding: 0 1rem; }
         .topbar-nav { gap: 0.85rem; }
         .topbar-link { font-size: 0.82rem; }
+        .topbar-link-home { display: none; }
         .site-main { padding: 2.5rem 1rem 5rem; }
         .post-list { grid-template-columns: 1fr; gap: 1.5rem; }
         .post-title { font-size: 1.25rem; }
@@ -530,8 +531,9 @@
         <div class="topbar-inner">
           <a href="{{ pathPrefix }}" class="topbar-brand" aria-label="{{ site.title }} — Home"><span>{{ site.title }}</span><span class="brand-dot">.</span></a>
           <div class="topbar-nav">
-            <a href="{{ pathPrefix }}" class="topbar-link">Home</a>
+            <a href="{{ pathPrefix }}" class="topbar-link topbar-link-home">Home</a>
             <a href="{{ pathPrefix }}topics/" class="topbar-link">Topics</a>
+            <a href="{{ pathPrefix }}archive/" class="topbar-link">Archive</a>
             {% if site.url %}<a href="{{ site.url }}/feed.xml" class="topbar-link">RSS</a>{% endif %}
             <button
               class="theme-toggle"
@@ -563,6 +565,7 @@
           <ul class="footer-links">
             <li><a href="{{ pathPrefix }}">Latest stories</a></li>
             <li><a href="{{ pathPrefix }}topics/">Topics</a></li>
+            <li><a href="{{ pathPrefix }}archive/">Archive</a></li>
             {% if audio and audio.wholeBlog %}<li><a href="{{ pathPrefix }}audio/whole-blog.mp3">Listen to whole blog ({{ audio.wholeBlog.minutes }} min)</a></li>{% endif %}
             {% if site.url %}<li><a href="{{ site.url }}/feed.xml">RSS feed</a></li>
             <li><a href="{{ site.url }}/feed.json">JSON feed</a></li>

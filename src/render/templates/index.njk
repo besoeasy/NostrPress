@@ -211,6 +211,37 @@
     color: var(--ink-subtle);
   }
 
+  .topic-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 0 0 3rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+  .topic-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--ink-muted);
+    text-decoration: none;
+    font-size: 0.84rem;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .topic-chip:hover {
+    color: var(--ink);
+    border-color: var(--ink-subtle);
+    background: var(--surface-alt);
+  }
+  .topic-chip-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-subtle);
+  }
+
   @media (max-width: 820px) {
     .featured { padding: 3rem 0 3.75rem; }
     .featured-art { margin-bottom: 1.25rem; }
@@ -245,6 +276,20 @@
       {% endif %}
     </div>
   </section>
+
+  {% if topics and topics.length %}
+  <nav class="topic-strip" aria-label="Browse topics">
+    {% for topic in topics | take(8) %}
+      <a class="topic-chip" href="{{ pathPrefix }}tags/{{ topic.slug }}/">
+        <span>#{{ topic.name }}</span>
+        <span class="topic-chip-count">{{ topic.count }}</span>
+      </a>
+    {% endfor %}
+    {% if topics.length > 8 %}
+      <a class="topic-chip" href="{{ pathPrefix }}topics/"><span>All topics</span></a>
+    {% endif %}
+  </nav>
+  {% endif %}
 
   {% if articles.length > 0 %}
   <section class="featured" aria-label="Featured story">

@@ -36,11 +36,16 @@ const sanitizer = (html) =>
       "h6",
       "span",
       "details",
-      "summary"
+      "summary",
+      "figure",
+      "figcaption",
+      "picture",
+      "source"
     ]),
     allowedAttributes: {
       a: ["href", "name", "target", "rel"],
-      img: ["src", "alt", "title", "loading"],
+      img: ["src", "alt", "title", "loading", "srcset", "sizes", "width", "height"],
+      source: ["src", "srcset", "type", "media", "sizes"],
       code: ["class"],
       pre: ["class"],
       span: ["class"],
@@ -78,9 +83,52 @@ export function findRelatedArticles(current, allArticles, limit = 3) {
   return scored.slice(0, limit).map(s => s.article);
 }
 
+function slugifyHeading(text) {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]*>/g, "")
+    .replace(/&[a-z0-9#]+;/gi, "")
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function renderMarkdown(article) {
-  const raw = md.render(article.content);
-  return sanitizer(raw);
+  const toc = [];
+  const usedIds = new Map();
+  const originalHeadingOpen =
+    md.renderer.rules.heading_open ||
+    ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
+
+  md.renderer.rules.heading_open = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const level = Number(token.tag.slice(1));
+    if (level >= 2 && level <= 3) {
+      const inline = tokens[idx + 1];
+      const text = (inline?.children || [])
+        .filter((t) => ["text", "code_inline", "image"].includes(t.type))
+        .map((t) => (t.type === "image" ? t.content || t.attrGet("alt") || "" : t.content))
+        .join("")
+        .trim();
+      const base = slugifyHeading(text) || `section-${toc.length + 1}`;
+      const count = usedIds.get(base) || 0;
+      usedIds.set(base, count + 1);
+      const id = count ? `${base}-${count}` : base;
+      token.attrSet("id", id);
+      toc.push({ level, text, id });
+    }
+    return originalHeadingOpen(tokens, idx, options, env, self);
+  };
+
+  try {
+    const raw = md.render(article.content);
+    article.toc = toc;
+    return sanitizer(raw);
+  } finally {
+    md.renderer.rules.heading_open = originalHeadingOpen;
+  }
 }
 
 function ensureDir(dir) {
@@ -156,9 +204,6 @@ export function renderSite(context, outputDir, { socialCards = false } = {}) {
     article.wordCount = article.content.trim().split(/\s+/).length;
   }
 
-  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted, pathPrefix: "./", ogBase: ogBaseFor("./"), socialCards });
-  writeFile(path.join(outputDir, "index.html"), indexHtml);
-
   const tagMap = new Map();
   for (const article of articlesSorted) {
     article.tagSlugs = article.tags.map(normalizeTag);
@@ -178,6 +223,15 @@ export function renderSite(context, outputDir, { socialCards = false } = {}) {
     }
   }
 
+  const topics = [];
+  for (const { name, slug, articles } of tagMap.values()) {
+    topics.push({ name, slug, count: articles.length });
+  }
+  topics.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+  const indexHtml = env.render("index.njk", { ...context, articles: articlesSorted, topics, pathPrefix: "./", ogBase: ogBaseFor("./"), socialCards });
+  writeFile(path.join(outputDir, "index.html"), indexHtml);
+
   for (let i = 0; i < articlesSorted.length; i++) {
     const article = articlesSorted[i];
     const relatedArticles = findRelatedArticles(article, articlesSorted);
@@ -196,13 +250,23 @@ export function renderSite(context, outputDir, { socialCards = false } = {}) {
     writeFile(path.join(outputDir, `${article.slug}.html`), articleHtml);
   }
 
-  const topics = [];
   for (const { name, slug, articles } of tagMap.values()) {
     const tagHtml = env.render("tag.njk", { ...context, tag: name, tagSlug: slug, articles, pathPrefix: "../../", ogBase: ogBaseFor("../../"), socialCards });
     writeFile(path.join(outputDir, "tags", slug, "index.html"), tagHtml);
-    topics.push({ name, slug, count: articles.length });
   }
-  topics.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
   const topicsHtml = env.render("topics.njk", { ...context, topics, pathPrefix: "../", ogBase: ogBaseFor("../"), socialCards });
   writeFile(path.join(outputDir, "topics", "index.html"), topicsHtml);
+
+  const archiveMap = new Map();
+  for (const article of articlesSorted) {
+    const year = new Date(article.published_at).getUTCFullYear();
+    if (!archiveMap.has(year)) archiveMap.set(year, []);
+    archiveMap.get(year).push(article);
+  }
+  const archive = Array.from(archiveMap.entries())
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, items]) => ({ year, articles: items }));
+  const archiveHtml = env.render("archive.njk", { ...context, articles: articlesSorted, archive, pathPrefix: "../", ogBase: ogBaseFor("../"), socialCards });
+  writeFile(path.join(outputDir, "archive", "index.html"), archiveHtml);
 }

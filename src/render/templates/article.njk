@@ -34,6 +34,21 @@
 </script>
 <style>
   /* ── Article page — Vercel editorial ─────────── */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    z-index: 120;
+    background: transparent;
+  }
+  .reading-progress-bar {
+    width: 0;
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.08s linear;
+  }
 
   /* Hero image */
   .article-hero {
@@ -234,6 +249,42 @@
     margin: 0 0.25rem;
   }
 
+  /* ── Table of contents ─────────────────────────── */
+  .article-toc {
+    margin: 0 0 2.5rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+  }
+  .article-toc summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    list-style: none;
+  }
+  .article-toc summary::-webkit-details-marker { display: none; }
+  .article-toc summary::after { content: " +"; color: var(--ink-subtle); }
+  .article-toc[open] summary::after { content: " −"; }
+  .article-toc-list {
+    list-style: none;
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+  .article-toc-list a {
+    color: var(--ink-muted);
+    text-decoration: none;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .article-toc-list a:hover { color: var(--accent); }
+  .article-toc-item.level-3 { padding-left: 1rem; }
+
   /* ── Prose ─────────────────────────────────────── */
   .prose {
     color: var(--prose-ink);
@@ -250,6 +301,7 @@
     color: var(--ink);
     margin-top: 2.4em;
     margin-bottom: 0.55em;
+    scroll-margin-top: 5rem;
   }
   .prose h1 { font-size: 1.9rem; }
   .prose h2 { font-size: 1.55rem; }
@@ -375,6 +427,18 @@
     border-radius: 10px;
     border: 1px solid var(--border);
     max-width: 100%;
+    height: auto;
+  }
+  .prose figure {
+    margin: 2em 0;
+  }
+  .prose figure img { margin: 0; }
+  .prose figcaption {
+    margin-top: 0.65rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--ink-subtle);
+    text-align: center;
   }
 
   .prose hr {
@@ -649,6 +713,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="reading-progress" aria-hidden="true"><div class="reading-progress-bar" id="reading-progress"></div></div>
 <article class="article-sheet" itemscope itemtype="https://schema.org/BlogPosting">
   <meta itemprop="headline" content="{{ article.title }}" />
   <meta itemprop="description" content="{{ pageDescription }}" />
@@ -733,6 +798,17 @@
       {% endif %}
     </div>
   </header>
+
+  {% if article.toc and article.toc.length >= 3 %}
+  <details class="article-toc">
+    <summary>Table of contents</summary>
+    <ol class="article-toc-list">
+      {% for item in article.toc %}
+        <li class="article-toc-item level-{{ item.level }}"><a href="#{{ item.id }}">{{ item.text }}</a></li>
+      {% endfor %}
+    </ol>
+  </details>
+  {% endif %}
 
   <div class="prose" itemprop="articleBody">
     {{ article.html | safe }}
@@ -828,4 +904,23 @@
     </ul>
   </section>
 {% endif %}
+<script>
+  (() => {
+    const bar = document.getElementById("reading-progress");
+    const article = document.querySelector(".article-sheet");
+    if (!bar || !article) return;
+    const update = () => {
+      const rect = article.getBoundingClientRect();
+      const articleTop = window.scrollY + rect.top;
+      const articleHeight = article.offsetHeight;
+      const viewport = window.innerHeight;
+      const max = Math.max(1, articleHeight - viewport * 0.6);
+      const progress = Math.min(1, Math.max(0, (window.scrollY - articleTop + viewport * 0.2) / max));
+      bar.style.width = `${progress * 100}%`;
+    };
+    document.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
+</script>
 {% endblock %}
