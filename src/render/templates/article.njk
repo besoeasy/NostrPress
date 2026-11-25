@@ -545,13 +545,23 @@
     color: var(--ink);
     letter-spacing: -0.015em;
     line-height: 1.4;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.35rem;
     transition: color 0.15s;
   }
   .related-item a:hover .related-title { color: var(--accent); }
-  .related-date {
+  .related-excerpt {
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+    line-height: 1.55;
+    margin-bottom: 0.45rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .related-meta {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     color: var(--ink-subtle);
   }
 
@@ -644,7 +654,7 @@
   <meta itemprop="description" content="{{ pageDescription }}" />
   <meta itemprop="datePublished" content="{{ article.published_at | date('iso') }}" />
   {% if article.modified_at %}
-  <meta itemprop="dateModified" content="{{ article.modified_at * 1000 | date('iso') }}" />
+  <meta itemprop="dateModified" content="{{ article.modified_at | date('iso') }}" />
   {% endif %}
   <meta itemprop="author" content="{{ author.profile.display_name or author.profile.name }}" />
   {% if article.image %}
@@ -675,7 +685,7 @@
       <div class="article-byline-text">
         <span class="article-byline-name">{{ author.profile.display_name or author.profile.name or site.title }}</span>
         <span class="article-byline-detail">
-          {{ article.published_at | date("human") }}{% if article.readingTime %} · {{ article.readingTime }} min read{% endif %}
+          {{ article.published_at | date("human") }}{% if article.modified_at %} · Updated {{ article.modified_at | date("human") }}{% endif %}{% if article.readingTime %} · {{ article.readingTime }} min read{% endif %}
         </span>
       </div>
     </div>
@@ -766,7 +776,7 @@
 <!-- Related articles -->
 {% if relatedArticles.length %}
   <section class="related-section" aria-labelledby="related-heading">
-    <p class="related-label" id="related-heading">Related</p>
+    <p class="related-label" id="related-heading">Keep reading</p>
     <ul class="related-list" role="list">
       {% for related in relatedArticles %}
         <li class="related-item">
@@ -775,11 +785,14 @@
               <img src="{{ related.image }}" alt="" class="related-thumb" loading="lazy" aria-hidden="true" />
             {% else %}
               <div class="related-thumb" style="display:flex;align-items:center;justify-content:center;">
-                <svg width="24" height="24" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--ink-subtle)"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </div>
             {% endif %}
             <div class="related-title">{{ related.title }}</div>
-            <div class="related-date">{{ related.published_at | date("short") }}</div>
+            {% if related.excerpt %}<div class="related-excerpt">{{ related.excerpt }}</div>{% endif %}
+            <div class="related-meta">
+              <time datetime="{{ related.published_at | date('iso') }}">{{ related.published_at | date("short") }}</time>{% if related.readingTime %} · {{ related.readingTime }} min read{% endif %}
+            </div>
           </a>
         </li>
       {% endfor %}

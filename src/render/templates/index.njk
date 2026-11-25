@@ -248,11 +248,11 @@
 
   {% if articles.length > 0 %}
   <section class="featured" aria-label="Featured story">
+    {% if featured.image %}
     <a class="featured-art" href="{{ pathPrefix }}{{ featured.slug }}.html" aria-hidden="true" tabindex="-1">
-      {% if featured.image %}
-        <img src="{{ featured.image }}" alt="" loading="eager" fetchpriority="high" />
-      {% endif %}
+      <img src="{{ featured.image }}" alt="" loading="eager" fetchpriority="high" />
     </a>
+    {% endif %}
     <div class="featured-top">
       <p class="featured-kicker">Featured story</p>
       <div class="featured-meta">

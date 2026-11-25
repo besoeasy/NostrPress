@@ -95,7 +95,8 @@ function writeFile(target, content) {
 export function createRenderer(templateDir) {
   const env = nunjucks.configure(templateDir, { autoescape: true });
   env.addFilter("date", (value, format) => {
-    const date = new Date(value);
+    const raw = typeof value === "number" && value > 0 && value < 1e12 ? value * 1000 : value;
+    const date = new Date(raw);
     if (Number.isNaN(date.getTime())) return "";
     if (format === "Y-m-d") {
       const year = date.getUTCFullYear();
