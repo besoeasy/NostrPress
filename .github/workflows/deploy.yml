@@ -45,6 +45,8 @@ jobs:
           restore-keys: nostr-cache-${{ hashFiles('package-lock.json') }}-
 
       - name: Install dependencies
+        env:
+          ONNXRUNTIME_NODE_INSTALL_CUDA: skip
         run: npm ci
 
       - name: Compute GitHub Pages URL
